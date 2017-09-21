@@ -175,13 +175,12 @@ func (c client) SendAppErrorLog(appID, message, sourceType, sourceInstance strin
 
 func (c client) SendAppMetrics(m *events.ContainerMetric) error {
 	c.client.EmitGauge(
-		loggregator.WithGaugeValue("instance_index", float64(m.GetInstanceIndex()), ""),
 		loggregator.WithGaugeValue("cpu", m.GetCpuPercentage(), "percentage"),
 		loggregator.WithGaugeValue("memory", float64(m.GetMemoryBytes()), "bytes"),
 		loggregator.WithGaugeValue("disk", float64(m.GetDiskBytes()), "bytes"),
 		loggregator.WithGaugeValue("memory_quota", float64(m.GetMemoryBytesQuota()), "bytes"),
 		loggregator.WithGaugeValue("disk_quota", float64(m.GetDiskBytesQuota()), "bytes"),
-		loggregator.WithGaugeAppInfo(m.GetApplicationId()),
+		loggregator.WithGaugeAppInfo(m.GetApplicationId(), int(m.GetInstanceIndex())),
 	)
 
 	return nil
