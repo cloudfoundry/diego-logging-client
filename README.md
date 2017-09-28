@@ -5,5 +5,5 @@ The Diego Logging Client provides a generic client for
 Cloud Foundry's logging subsystem,
 [Loggregator](https://github.com/cloudfoundry/loggregator).
 
-The client wraps [go-loggregator](https://github.com/cloudfoundry/go-loggregator)
-and provides an ideal interface to Diego components.
+The client wraps the [go-loggregator](https://github.com/cloudfoundry/go-loggregator) library
+to provide a tailored interface for Diego components.
