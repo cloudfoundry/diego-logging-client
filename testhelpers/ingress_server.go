@@ -16,6 +16,7 @@ type TestIngressServer struct {
 	addr       string
 	tlsConfig  *tls.Config
 	grpcServer *grpc.Server
+	closed     chan struct{}
 }
 
 func NewTestIngressServer(serverCert, serverKey, caCert string) (*TestIngressServer, error) {
@@ -42,6 +43,7 @@ func NewTestIngressServer(serverCert, serverKey, caCert string) (*TestIngressSer
 		tlsConfig: tlsConfig,
 		receivers: make(chan loggregator_v2.Ingress_BatchSenderServer),
 		addr:      "localhost:0",
+		closed:    make(chan struct{}),
 	}, nil
 }
 
@@ -69,6 +71,7 @@ func (t *TestIngressServer) Start() error {
 	senderServer := &FakeIngressServer{}
 	senderServer.BatchSenderStub = func(recv loggregator_v2.Ingress_BatchSenderServer) error {
 		t.receivers <- recv
+		<-t.closed
 		return nil
 	}
 	loggregator_v2.RegisterIngressServer(t.grpcServer, senderServer)
@@ -80,4 +83,5 @@ func (t *TestIngressServer) Start() error {
 
 func (t *TestIngressServer) Stop() {
 	t.grpcServer.Stop()
+	close(t.closed)
 }
