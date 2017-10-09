@@ -22,7 +22,7 @@ type Config struct {
 	JobIP         string `json:"loggregator_job_ip"`
 	JobOrigin     string `json:"loggregator_job_origin"`
 
-	BatchMaxSize       uint
+	BatchMaxSize       uint `json:"loggregator_batch_max_size"`
 	BatchFlushInterval time.Duration
 }
 
