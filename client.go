@@ -1,4 +1,4 @@
-package loggingclient
+package diego_logging_client
 
 import (
 	"fmt"
