@@ -29,7 +29,7 @@ type Config struct {
 // IngressClient is the shared contract between v1 and v2 clients.
 //go:generate counterfeiter -o testhelpers/fake_ingress_client.go . IngressClient
 type IngressClient interface {
-	SendDuration(name string, value time.Duration) error
+	SendDuration(name string, value time.Duration, opts ...loggregator.EmitGaugeOption) error
 	SendMebiBytes(name string, value int) error
 	SendMetric(name string, value int, opts ...loggregator.EmitGaugeOption) error
 	SendBytesPerSecond(name string, value float64) error
@@ -109,10 +109,10 @@ type client struct {
 	client logClient
 }
 
-func (c client) SendDuration(name string, value time.Duration) error {
-	c.client.EmitGauge(
-		loggregator.WithGaugeValue(name, float64(value), "nanos"),
-	)
+func (c client) SendDuration(name string, value time.Duration, opts ...loggregator.EmitGaugeOption) error {
+	opts = append(opts, loggregator.WithGaugeValue(name, float64(value), "nanos"))
+	c.client.EmitGauge(opts...)
+
 	return nil
 }
 

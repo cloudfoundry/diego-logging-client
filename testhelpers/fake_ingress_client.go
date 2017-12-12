@@ -11,11 +11,12 @@ import (
 )
 
 type FakeIngressClient struct {
-	SendDurationStub        func(name string, value time.Duration) error
+	SendDurationStub        func(name string, value time.Duration, opts ...loggregator.EmitGaugeOption) error
 	sendDurationMutex       sync.RWMutex
 	sendDurationArgsForCall []struct {
 		name  string
 		value time.Duration
+		opts  []loggregator.EmitGaugeOption
 	}
 	sendDurationReturns struct {
 		result1 error
@@ -151,17 +152,18 @@ type FakeIngressClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeIngressClient) SendDuration(name string, value time.Duration) error {
+func (fake *FakeIngressClient) SendDuration(name string, value time.Duration, opts ...loggregator.EmitGaugeOption) error {
 	fake.sendDurationMutex.Lock()
 	ret, specificReturn := fake.sendDurationReturnsOnCall[len(fake.sendDurationArgsForCall)]
 	fake.sendDurationArgsForCall = append(fake.sendDurationArgsForCall, struct {
 		name  string
 		value time.Duration
-	}{name, value})
-	fake.recordInvocation("SendDuration", []interface{}{name, value})
+		opts  []loggregator.EmitGaugeOption
+	}{name, value, opts})
+	fake.recordInvocation("SendDuration", []interface{}{name, value, opts})
 	fake.sendDurationMutex.Unlock()
 	if fake.SendDurationStub != nil {
-		return fake.SendDurationStub(name, value)
+		return fake.SendDurationStub(name, value, opts...)
 	}
 	if specificReturn {
 		return ret.result1
@@ -175,10 +177,10 @@ func (fake *FakeIngressClient) SendDurationCallCount() int {
 	return len(fake.sendDurationArgsForCall)
 }
 
-func (fake *FakeIngressClient) SendDurationArgsForCall(i int) (string, time.Duration) {
+func (fake *FakeIngressClient) SendDurationArgsForCall(i int) (string, time.Duration, []loggregator.EmitGaugeOption) {
 	fake.sendDurationMutex.RLock()
 	defer fake.sendDurationMutex.RUnlock()
-	return fake.sendDurationArgsForCall[i].name, fake.sendDurationArgsForCall[i].value
+	return fake.sendDurationArgsForCall[i].name, fake.sendDurationArgsForCall[i].value, fake.sendDurationArgsForCall[i].opts
 }
 
 func (fake *FakeIngressClient) SendDurationReturns(result1 error) {
