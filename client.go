@@ -5,7 +5,6 @@ import (
 	"time"
 
 	loggregator "code.cloudfoundry.org/go-loggregator"
-	"code.cloudfoundry.org/go-loggregator/v1"
 	"github.com/cloudfoundry/sonde-go/events"
 )
 
@@ -42,24 +41,13 @@ type IngressClient interface {
 	SendComponentMetric(name string, value float64, unit string) error
 }
 
-// NewIngressClient returns a v1 or v2 client depending on the value of `UseV2API`
-// from the config
+// NewIngressClient returns a v2 client if the config.UseV2API is true, or a no op client.
 func NewIngressClient(config Config) (IngressClient, error) {
 	if config.UseV2API {
 		return newV2IngressClient(config)
 	}
 
-	return newV1IngressClient(config)
-}
-
-// NewV1IngressClient creates a V1 connection to the Loggregator API.
-func newV1IngressClient(config Config) (IngressClient, error) {
-	c, err := v1.NewClient()
-	if err != nil {
-		return nil, err
-	}
-
-	return client{client: c}, nil
+	return new(noopIngressClient), nil
 }
 
 // NewV2IngressClient creates a V2 connection to the Loggregator API.
