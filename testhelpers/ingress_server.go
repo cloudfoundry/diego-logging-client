@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"io/ioutil"
 	"net"
+	"strconv"
 
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
 	"google.golang.org/grpc"
@@ -43,6 +44,14 @@ func NewTestIngressServer(serverCert, serverKey, caCert string) (*TestIngressSer
 		receivers: make(chan loggregator_v2.Ingress_BatchSenderServer),
 		addr:      "localhost:0",
 	}, nil
+}
+
+func (t *TestIngressServer) Port() (int, error) {
+	_, port, err := net.SplitHostPort(t.Addr())
+	if err != nil {
+		return 0, err
+	}
+	return strconv.Atoi(port)
 }
 
 func (t *TestIngressServer) Addr() string {
