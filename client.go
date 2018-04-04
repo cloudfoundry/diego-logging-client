@@ -20,6 +20,8 @@ type Config struct {
 	JobIndex      string `json:"loggregator_job_index"`
 	JobIP         string `json:"loggregator_job_ip"`
 	JobOrigin     string `json:"loggregator_job_origin"`
+	SourceID      string `json:"loggregator_source_id"`
+	InstanceID    string `json:"loggregator_instance_id"`
 
 	BatchMaxSize       uint `json:"loggregator_batch_max_size"`
 	BatchFlushInterval time.Duration
@@ -84,7 +86,11 @@ func newV2IngressClient(config Config) (IngressClient, error) {
 		return nil, err
 	}
 
-	return client{client: c}, nil
+	return WrapClient(c, config.SourceID, config.InstanceID), nil
+}
+
+func WrapClient(c logClient, s, i string) IngressClient {
+	return client{client: c, sourceID: s, instanceID: i}
 }
 
 type logClient interface {
@@ -94,11 +100,16 @@ type logClient interface {
 }
 
 type client struct {
-	client logClient
+	client     logClient
+	sourceID   string
+	instanceID string
 }
 
 func (c client) SendDuration(name string, value time.Duration, opts ...loggregator.EmitGaugeOption) error {
-	opts = append(opts, loggregator.WithGaugeValue(name, float64(value), "nanos"))
+	opts = append([]loggregator.EmitGaugeOption{
+		loggregator.WithGaugeSourceInfo(c.sourceID, c.instanceID),
+		loggregator.WithGaugeValue(name, float64(value), "nanos"),
+	}, opts...)
 	c.client.EmitGauge(opts...)
 
 	return nil
@@ -106,13 +117,17 @@ func (c client) SendDuration(name string, value time.Duration, opts ...loggregat
 
 func (c client) SendMebiBytes(name string, value int) error {
 	c.client.EmitGauge(
+		loggregator.WithGaugeSourceInfo(c.sourceID, c.instanceID),
 		loggregator.WithGaugeValue(name, float64(value), "MiB"),
 	)
 	return nil
 }
 
 func (c client) SendMetric(name string, value int, opts ...loggregator.EmitGaugeOption) error {
-	opts = append(opts, loggregator.WithGaugeValue(name, float64(value), "Metric"))
+	opts = append([]loggregator.EmitGaugeOption{
+		loggregator.WithGaugeSourceInfo(c.sourceID, c.instanceID),
+		loggregator.WithGaugeValue(name, float64(value), "Metric"),
+	}, opts...)
 	c.client.EmitGauge(opts...)
 
 	return nil
@@ -120,6 +135,7 @@ func (c client) SendMetric(name string, value int, opts ...loggregator.EmitGauge
 
 func (c client) SendBytesPerSecond(name string, value float64) error {
 	c.client.EmitGauge(
+		loggregator.WithGaugeSourceInfo(c.sourceID, c.instanceID),
 		loggregator.WithGaugeValue(name, value, "B/s"),
 	)
 	return nil
@@ -127,19 +143,27 @@ func (c client) SendBytesPerSecond(name string, value float64) error {
 
 func (c client) SendRequestsPerSecond(name string, value float64) error {
 	c.client.EmitGauge(
+		loggregator.WithGaugeSourceInfo(c.sourceID, c.instanceID),
 		loggregator.WithGaugeValue(name, value, "Req/s"),
 	)
 	return nil
 }
 
 func (c client) IncrementCounter(name string) error {
-	c.client.EmitCounter(name)
+	c.client.EmitCounter(
+		name,
+		loggregator.WithCounterSourceInfo(c.sourceID, c.instanceID),
+	)
 
 	return nil
 }
 
 func (c client) IncrementCounterWithDelta(name string, value uint64) error {
-	c.client.EmitCounter(name, loggregator.WithDelta(value))
+	c.client.EmitCounter(
+		name,
+		loggregator.WithCounterSourceInfo(c.sourceID, c.instanceID),
+		loggregator.WithDelta(value),
+	)
 
 	return nil
 }
@@ -163,12 +187,12 @@ func (c client) SendAppErrorLog(appID, message, sourceType, sourceInstance strin
 
 func (c client) SendAppMetrics(m *events.ContainerMetric) error {
 	c.client.EmitGauge(
+		loggregator.WithGaugeAppInfo(m.GetApplicationId(), int(m.GetInstanceIndex())),
 		loggregator.WithGaugeValue("cpu", m.GetCpuPercentage(), "percentage"),
 		loggregator.WithGaugeValue("memory", float64(m.GetMemoryBytes()), "bytes"),
 		loggregator.WithGaugeValue("disk", float64(m.GetDiskBytes()), "bytes"),
 		loggregator.WithGaugeValue("memory_quota", float64(m.GetMemoryBytesQuota()), "bytes"),
 		loggregator.WithGaugeValue("disk_quota", float64(m.GetDiskBytesQuota()), "bytes"),
-		loggregator.WithGaugeAppInfo(m.GetApplicationId(), int(m.GetInstanceIndex())),
 	)
 
 	return nil
@@ -176,6 +200,7 @@ func (c client) SendAppMetrics(m *events.ContainerMetric) error {
 
 func (c client) SendComponentMetric(name string, value float64, unit string) error {
 	c.client.EmitGauge(
+		loggregator.WithGaugeSourceInfo(c.sourceID, c.instanceID),
 		loggregator.WithGaugeValue(name, value, unit),
 	)
 

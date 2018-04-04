@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
+	"golang.org/x/net/context"
 )
 
 type FakeIngressServer struct {
@@ -32,6 +33,10 @@ type FakeIngressServer struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (f *FakeIngressServer) Send(context.Context, *loggregator_v2.EnvelopeBatch) (*loggregator_v2.SendResponse, error) {
+	panic("not implemented")
 }
 
 func (fake *FakeIngressServer) Sender(arg1 loggregator_v2.Ingress_SenderServer) error {
