@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"google.golang.org/grpc"
+
 	loggregator "code.cloudfoundry.org/go-loggregator"
 	"github.com/cloudfoundry/sonde-go/events"
 )
@@ -80,6 +82,8 @@ func newV2IngressClient(config Config) (IngressClient, error) {
 	if config.APIPort != 0 {
 		opts = append(opts, loggregator.WithAddr(fmt.Sprintf("localhost:%d", config.APIPort)))
 	}
+
+	opts = append(opts, loggregator.WithDialOptions(grpc.WithBlock(), grpc.WithTimeout(time.Second)))
 
 	c, err := loggregator.NewIngressClient(tlsConfig, opts...)
 	if err != nil {
