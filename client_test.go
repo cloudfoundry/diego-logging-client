@@ -1,164 +1,164 @@
 package diego_logging_client_test
 
 import (
-	"os"
-	"path"
 	"time"
 
 	client "code.cloudfoundry.org/diego-logging-client"
-	"code.cloudfoundry.org/diego-logging-client/testhelpers"
+	"code.cloudfoundry.org/go-loggregator"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var (
-	fixturesPath         = path.Join(os.Getenv("GOPATH"), "src/code.cloudfoundry.org/diego-logging-client/fixtures")
-	metronCAFile         = path.Join(fixturesPath, "metron", "CA.crt")
-	metronServerCertFile = path.Join(fixturesPath, "metron", "metron.crt")
-	metronServerKeyFile  = path.Join(fixturesPath, "metron", "metron.key")
-	metronClientCertFile = path.Join(fixturesPath, "metron", "client.crt")
-	metronClientKeyFile  = path.Join(fixturesPath, "metron", "client.key")
-)
-
 var _ = Describe("DiegoLoggingClient", func() {
 	var (
-		c client.IngressClient
+		s       *spyLogClient
+		c       client.IngressClient
+		gauge   *loggregator_v2.Envelope
+		counter *loggregator_v2.Envelope
 	)
 
-	Context("when the v2 api is used", func() {
-		var (
-			testIngressServer *testhelpers.TestIngressServer
-			metricsPort       int
-		)
+	BeforeEach(func() {
+		s = newSpyLogClient()
+		c = client.WrapClient(s, "some-source-id", "some-instance-id")
+		gauge = &loggregator_v2.Envelope{
+			Timestamp: time.Now().UnixNano(),
+			Message: &loggregator_v2.Envelope_Gauge{
+				Gauge: &loggregator_v2.Gauge{
+					Metrics: make(map[string]*loggregator_v2.GaugeValue),
+				},
+			},
+			Tags: make(map[string]string),
+		}
+		counter = &loggregator_v2.Envelope{
+			Timestamp: time.Now().UnixNano(),
+			Message: &loggregator_v2.Envelope_Counter{
+				Counter: &loggregator_v2.Counter{},
+			},
+			Tags: make(map[string]string),
+		}
+	})
 
-		BeforeEach(func() {
-			var err error
+	Describe("SendDuration", func() {
+		It("sets app info", func() {
+			c.SendDuration("time", 18*time.Second)
 
-			testIngressServer, err = testhelpers.NewTestIngressServer(metronServerCertFile, metronServerKeyFile, metronCAFile)
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(testIngressServer.Start()).To(Succeed())
-
-			metricsPort, err = testIngressServer.Port()
-			Expect(err).NotTo(HaveOccurred())
-		})
-
-		Context("and the loggregator agent isn't up", func() {
-			BeforeEach(func() {
-				testIngressServer.Stop()
-			})
-
-			It("returns an error when constructing the loggregator client", func() {
-				metricsPort := 8080
-
-				_, err := client.NewIngressClient(client.Config{
-					SourceID:           "some-source-id",
-					InstanceID:         "some-instance-id",
-					BatchFlushInterval: 10 * time.Millisecond,
-					BatchMaxSize:       1,
-					UseV2API:           true,
-					APIPort:            metricsPort,
-					CACertPath:         metronCAFile,
-					KeyPath:            metronClientKeyFile,
-					CertPath:           metronClientCertFile,
-				})
-				Expect(err).To(HaveOccurred())
-			})
-		})
-
-		Context("and the loggregator agent is up", func() {
-			BeforeEach(func() {
-				var err error
-				c, err = client.NewIngressClient(client.Config{
-					SourceID:           "some-source-id",
-					InstanceID:         "some-instance-id",
-					BatchFlushInterval: 10 * time.Millisecond,
-					BatchMaxSize:       1,
-					UseV2API:           true,
-					APIPort:            metricsPort,
-					CACertPath:         metronCAFile,
-					KeyPath:            metronClientKeyFile,
-					CertPath:           metronClientCertFile,
-				})
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			assertEnvelopeSourceAndInstanceIDAreCorrect := func() {
-				var sender loggregator_v2.Ingress_BatchSenderServer
-				Eventually(testIngressServer.Receivers()).Should(Receive(&sender))
-
-				batch, err := sender.Recv()
-				Expect(err).NotTo(HaveOccurred())
-
-				Expect(batch.Batch).To(HaveLen(1))
-				Expect(batch.Batch[0].GetSourceId()).To(Equal("some-source-id"))
-				Expect(batch.Batch[0].GetInstanceId()).To(Equal("some-instance-id"))
+			for _, o := range s.gaugeOpts {
+				o(gauge)
 			}
 
-			Describe("SendDuration", func() {
-				It("sets app info", func() {
-					Expect(c.SendDuration("time", 18*time.Second)).To(Succeed())
+			Expect(gauge.GetSourceId()).To(Equal("some-source-id"))
+			Expect(gauge.GetInstanceId()).To(Equal("some-instance-id"))
+		})
+	})
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
-				})
-			})
+	Describe("SendMebiBytes", func() {
+		It("sets app info", func() {
+			c.SendMebiBytes("disk-free", 23)
 
-			Describe("SendMebiBytes", func() {
-				It("sets app info", func() {
-					Expect(c.SendMebiBytes("disk-free", 23)).To(Succeed())
+			for _, o := range s.gaugeOpts {
+				o(gauge)
+			}
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
-				})
-			})
+			Expect(gauge.GetSourceId()).To(Equal("some-source-id"))
+			Expect(gauge.GetInstanceId()).To(Equal("some-instance-id"))
+		})
+	})
 
-			Describe("SendMetric", func() {
-				It("sets app info", func() {
-					Expect(c.SendMetric("errors", 3)).To(Succeed())
+	Describe("SendMetric", func() {
+		It("sets app info", func() {
+			c.SendMetric("errors", 3)
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
-				})
-			})
+			for _, o := range s.gaugeOpts {
+				o(gauge)
+			}
 
-			Describe("SendBytesPerSecond", func() {
-				It("sets app info", func() {
-					Expect(c.SendBytesPerSecond("speed", 3)).To(Succeed())
+			Expect(gauge.GetSourceId()).To(Equal("some-source-id"))
+			Expect(gauge.GetInstanceId()).To(Equal("some-instance-id"))
+		})
+	})
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
-				})
-			})
+	Describe("SendBytesPerSecond", func() {
+		It("sets app info", func() {
+			c.SendBytesPerSecond("speed", 3)
 
-			Describe("SendRequestsPerSecond", func() {
-				It("sets app info", func() {
-					Expect(c.SendRequestsPerSecond("homepage", 37)).To(Succeed())
+			for _, o := range s.gaugeOpts {
+				o(gauge)
+			}
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
-				})
-			})
+			Expect(gauge.GetSourceId()).To(Equal("some-source-id"))
+			Expect(gauge.GetInstanceId()).To(Equal("some-instance-id"))
+		})
+	})
 
-			Describe("IncrementCounter", func() {
-				It("sets app info", func() {
-					Expect(c.IncrementCounter("its")).To(Succeed())
+	Describe("SendRequestsPerSecond", func() {
+		It("sets app info", func() {
+			c.SendRequestsPerSecond("homepage", 37)
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
-				})
-			})
+			for _, o := range s.gaugeOpts {
+				o(gauge)
+			}
 
-			Describe("IncrementCounterWithDelta", func() {
-				It("sets app info", func() {
-					Expect(c.IncrementCounterWithDelta("its", 5)).To(Succeed())
+			Expect(gauge.GetSourceId()).To(Equal("some-source-id"))
+			Expect(gauge.GetInstanceId()).To(Equal("some-instance-id"))
+		})
+	})
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
-				})
-			})
+	Describe("IncrementCounter", func() {
+		It("sets app info", func() {
+			c.IncrementCounter("its")
 
-			Describe("SendComponentMetric", func() {
-				It("sets app info", func() {
-					Expect(c.SendComponentMetric("memory", 37, "GB")).To(Succeed())
+			for _, o := range s.counterOpts {
+				o(counter)
+			}
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
-				})
-			})
+			Expect(counter.GetSourceId()).To(Equal("some-source-id"))
+			Expect(counter.GetInstanceId()).To(Equal("some-instance-id"))
+		})
+	})
+
+	Describe("IncrementCounterWithDelta", func() {
+		It("sets app info", func() {
+			c.IncrementCounterWithDelta("its", 5)
+
+			for _, o := range s.counterOpts {
+				o(counter)
+			}
+
+			Expect(counter.GetSourceId()).To(Equal("some-source-id"))
+			Expect(counter.GetInstanceId()).To(Equal("some-instance-id"))
+		})
+	})
+
+	Describe("SendComponentMetric", func() {
+		It("sets app info", func() {
+			c.SendComponentMetric("memory", 37, "GB")
+
+			for _, o := range s.gaugeOpts {
+				o(gauge)
+			}
+
+			Expect(gauge.GetSourceId()).To(Equal("some-source-id"))
+			Expect(gauge.GetInstanceId()).To(Equal("some-instance-id"))
 		})
 	})
 })
+
+type spyLogClient struct {
+	gaugeOpts   []loggregator.EmitGaugeOption
+	counterOpts []loggregator.EmitCounterOption
+}
+
+func newSpyLogClient() *spyLogClient {
+	return &spyLogClient{}
+}
+
+func (c *spyLogClient) EmitLog(msg string, opts ...loggregator.EmitLogOption) {}
+
+func (c *spyLogClient) EmitGauge(opts ...loggregator.EmitGaugeOption) {
+	c.gaugeOpts = opts
+}
+
+func (c *spyLogClient) EmitCounter(name string, opts ...loggregator.EmitCounterOption) {
+	c.counterOpts = opts
+}
