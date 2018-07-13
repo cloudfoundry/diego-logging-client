@@ -80,7 +80,7 @@ func newV2IngressClient(config Config) (IngressClient, error) {
 	}
 
 	if config.APIPort != 0 {
-		opts = append(opts, loggregator.WithAddr(fmt.Sprintf("localhost:%d", config.APIPort)))
+		opts = append(opts, loggregator.WithAddr(fmt.Sprintf("127.0.0.1:%d", config.APIPort)))
 	}
 
 	opts = append(opts, loggregator.WithDialOptions(grpc.WithBlock(), grpc.WithTimeout(time.Second)))
