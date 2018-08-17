@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	fixturesPath         = path.Join(os.Getenv("GOPATH"), "src/code.cloudfoundry.org/diego-logging-client/fixtures")
+	fixturesPath         = path.Join(os.Getenv("TOPDIR"), "src/code.cloudfoundry.org/diego-logging-client/fixtures")
 	metronCAFile         = path.Join(fixturesPath, "metron", "CA.crt")
 	metronServerCertFile = path.Join(fixturesPath, "metron", "metron.crt")
 	metronServerKeyFile  = path.Join(fixturesPath, "metron", "metron.key")
