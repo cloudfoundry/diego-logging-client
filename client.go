@@ -7,7 +7,6 @@ import (
 	"google.golang.org/grpc"
 
 	loggregator "code.cloudfoundry.org/go-loggregator"
-	"github.com/cloudfoundry/sonde-go/events"
 )
 
 // Config is the shared configuration between v1 and v2 clients.
@@ -29,6 +28,20 @@ type Config struct {
 	BatchFlushInterval time.Duration
 }
 
+// A ContainerMetric records resource usage of an app in a container.
+type ContainerMetric struct {
+	ApplicationId          string
+	InstanceIndex          int32
+	CpuPercentage          float64
+	MemoryBytes            uint64
+	DiskBytes              uint64
+	MemoryBytesQuota       uint64
+	DiskBytesQuota         uint64
+	AbsoluteCPUUsage       uint64
+	AbsoluteCPUEntitlement uint64
+	ContainerAge           uint64
+}
+
 // IngressClient is the shared contract between v1 and v2 clients.
 //go:generate counterfeiter -o testhelpers/fake_ingress_client.go . IngressClient
 type IngressClient interface {
@@ -41,7 +54,7 @@ type IngressClient interface {
 	IncrementCounterWithDelta(name string, value uint64) error
 	SendAppLog(appID, message, sourceType, sourceInstance string) error
 	SendAppErrorLog(appID, message, sourceType, sourceInstance string) error
-	SendAppMetrics(metrics *events.ContainerMetric) error
+	SendAppMetrics(metrics ContainerMetric) error
 	SendComponentMetric(name string, value float64, unit string) error
 }
 
@@ -189,14 +202,28 @@ func (c client) SendAppErrorLog(appID, message, sourceType, sourceInstance strin
 	return nil
 }
 
-func (c client) SendAppMetrics(m *events.ContainerMetric) error {
+func (c client) SendAppMetrics(m ContainerMetric) error {
 	c.client.EmitGauge(
-		loggregator.WithGaugeAppInfo(m.GetApplicationId(), int(m.GetInstanceIndex())),
-		loggregator.WithGaugeValue("cpu", m.GetCpuPercentage(), "percentage"),
-		loggregator.WithGaugeValue("memory", float64(m.GetMemoryBytes()), "bytes"),
-		loggregator.WithGaugeValue("disk", float64(m.GetDiskBytes()), "bytes"),
-		loggregator.WithGaugeValue("memory_quota", float64(m.GetMemoryBytesQuota()), "bytes"),
-		loggregator.WithGaugeValue("disk_quota", float64(m.GetDiskBytesQuota()), "bytes"),
+		loggregator.WithGaugeAppInfo(m.ApplicationId, int(m.InstanceIndex)),
+		loggregator.WithGaugeValue("cpu", m.CpuPercentage, "percentage"),
+		loggregator.WithGaugeValue("memory", float64(m.MemoryBytes), "bytes"),
+		loggregator.WithGaugeValue("disk", float64(m.DiskBytes), "bytes"),
+		loggregator.WithGaugeValue("memory_quota", float64(m.MemoryBytesQuota), "bytes"),
+		loggregator.WithGaugeValue("disk_quota", float64(m.DiskBytesQuota), "bytes"),
+	)
+
+	// Emit the new metrics in a separate envelope.  Loggregator will convert a
+	// gauge envelope with cpu, memory, disk, etc. to a container metric
+	// envelope and ignore the rest of the fields.  Emitting absolute_usage,
+	// absolute_entitlement & container_age in a separate envelope allows v1
+	// subscribers (cf nozzle) to be able to see those fields.  Note,
+	// Loggregator will emit each value in a separate envelope for v1
+	// subscribers.
+	c.client.EmitGauge(
+		loggregator.WithGaugeAppInfo(m.ApplicationId, int(m.InstanceIndex)),
+		loggregator.WithGaugeValue("absolute_usage", float64(m.AbsoluteCPUUsage), "nanoseconds"),
+		loggregator.WithGaugeValue("absolute_entitlement", float64(m.AbsoluteCPUEntitlement), "nanoseconds"),
+		loggregator.WithGaugeValue("container_age", float64(m.ContainerAge), "nanoseconds"),
 	)
 
 	return nil

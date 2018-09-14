@@ -4,7 +4,6 @@ import (
 	"time"
 
 	loggregator "code.cloudfoundry.org/go-loggregator"
-	"github.com/cloudfoundry/sonde-go/events"
 )
 
 type noopIngressClient struct{}
@@ -36,9 +35,12 @@ func (*noopIngressClient) SendAppLog(appID, message, sourceType, sourceInstance 
 func (*noopIngressClient) SendAppErrorLog(appID, message, sourceType, sourceInstance string) error {
 	return nil
 }
-func (*noopIngressClient) SendAppMetrics(metrics *events.ContainerMetric) error {
+func (*noopIngressClient) SendAppMetrics(metrics ContainerMetric) error {
 	return nil
 }
 func (*noopIngressClient) SendComponentMetric(name string, value float64, unit string) error {
+	return nil
+}
+func (*noopIngressClient) SendCPUUsage(applicationID string, instanceIndex int, absoluteUsage, absoluteEntitlement, containerAge uint64) error {
 	return nil
 }

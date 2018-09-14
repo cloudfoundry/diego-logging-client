@@ -68,7 +68,11 @@ var _ = Describe("DiegoLoggingClient", func() {
 		})
 
 		Context("and the loggregator agent is up", func() {
+			var sender loggregator_v2.Ingress_BatchSenderServer
+
 			BeforeEach(func() {
+				sender = nil
+
 				var err error
 				c, err = client.NewIngressClient(client.Config{
 					SourceID:           "some-source-id",
@@ -84,13 +88,16 @@ var _ = Describe("DiegoLoggingClient", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 
-			assertEnvelopeSourceAndInstanceIDAreCorrect := func() {
-				var sender loggregator_v2.Ingress_BatchSenderServer
-				Eventually(testIngressServer.Receivers()).Should(Receive(&sender))
-
+			getEnvelopeBatch := func() *loggregator_v2.EnvelopeBatch {
+				if sender == nil {
+					Eventually(testIngressServer.Receivers()).Should(Receive(&sender))
+				}
 				batch, err := sender.Recv()
 				Expect(err).NotTo(HaveOccurred())
+				return batch
+			}
 
+			assertEnvelopeSourceAndInstanceIDAreCorrect := func(batch *loggregator_v2.EnvelopeBatch) {
 				Expect(batch.Batch).To(HaveLen(1))
 				Expect(batch.Batch[0].GetSourceId()).To(Equal("some-source-id"))
 				Expect(batch.Batch[0].GetInstanceId()).To(Equal("some-instance-id"))
@@ -100,7 +107,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.SendDuration("time", 18*time.Second)).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -108,7 +115,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.SendMebiBytes("disk-free", 23)).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -116,7 +123,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.SendMetric("errors", 3)).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -124,7 +131,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.SendBytesPerSecond("speed", 3)).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -132,7 +139,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.SendRequestsPerSecond("homepage", 37)).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -140,7 +147,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.IncrementCounter("its")).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -148,7 +155,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.IncrementCounterWithDelta("its", 5)).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -156,7 +163,71 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.SendComponentMetric("memory", 37, "GB")).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
+				})
+			})
+
+			Describe("SendAppMetrics", func() {
+				var batch *loggregator_v2.EnvelopeBatch
+
+				JustBeforeEach(func() {
+					metrics := client.ContainerMetric{
+						ApplicationId: "some-source-id",
+						InstanceIndex: 345,
+
+						MemoryBytes:      50,
+						MemoryBytesQuota: 100,
+
+						DiskBytes:      100,
+						DiskBytesQuota: 200,
+
+						CpuPercentage:          50.0,
+						AbsoluteCPUUsage:       1,
+						AbsoluteCPUEntitlement: 2,
+						ContainerAge:           3,
+					}
+
+					Expect(c.SendAppMetrics(metrics)).To(Succeed())
+					batch = getEnvelopeBatch()
+				})
+
+				It("sets app info", func() {
+					Expect(batch.Batch).To(HaveLen(1))
+					Expect(batch.Batch[0].GetSourceId()).To(Equal("some-source-id"))
+					Expect(batch.Batch[0].GetInstanceId()).To(Equal("345"))
+				})
+
+				It("sends memory usage and quota", func() {
+					metrics := batch.Batch[0].GetGauge().GetMetrics()
+					Expect(metrics["memory"].GetValue()).To(Equal(float64(50)))
+					Expect(metrics["memory"].GetUnit()).To(Equal("bytes"))
+
+					Expect(metrics["memory_quota"].GetValue()).To(Equal(float64(100)))
+					Expect(metrics["memory_quota"].GetUnit()).To(Equal("bytes"))
+				})
+
+				It("sends disk usage and quota", func() {
+					metrics := batch.Batch[0].GetGauge().GetMetrics()
+					Expect(metrics["disk"].GetValue()).To(Equal(float64(100)))
+					Expect(metrics["disk"].GetUnit()).To(Equal("bytes"))
+
+					Expect(metrics["disk_quota"].GetValue()).To(Equal(float64(200)))
+					Expect(metrics["disk_quota"].GetUnit()).To(Equal("bytes"))
+				})
+
+				It("sends cpu usage in a separate batch", func() {
+					batch = getEnvelopeBatch()
+
+					metrics := batch.Batch[0].GetGauge().GetMetrics()
+
+					Expect(metrics["absolute_usage"].GetValue()).To(Equal(float64(1)))
+					Expect(metrics["absolute_usage"].GetUnit()).To(Equal("nanoseconds"))
+
+					Expect(metrics["absolute_entitlement"].GetValue()).To(Equal(float64(2)))
+					Expect(metrics["absolute_entitlement"].GetUnit()).To(Equal("nanoseconds"))
+
+					Expect(metrics["container_age"].GetValue()).To(Equal(float64(3)))
+					Expect(metrics["container_age"].GetUnit()).To(Equal("nanoseconds"))
 				})
 			})
 		})

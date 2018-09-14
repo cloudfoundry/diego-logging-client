@@ -7,7 +7,6 @@ import (
 
 	diego_logging_client "code.cloudfoundry.org/diego-logging-client"
 	"code.cloudfoundry.org/go-loggregator"
-	"github.com/cloudfoundry/sonde-go/events"
 )
 
 type FakeIngressClient struct {
@@ -124,10 +123,10 @@ type FakeIngressClient struct {
 	sendAppErrorLogReturnsOnCall map[int]struct {
 		result1 error
 	}
-	SendAppMetricsStub        func(metrics *events.ContainerMetric) error
+	SendAppMetricsStub        func(metrics diego_logging_client.ContainerMetric) error
 	sendAppMetricsMutex       sync.RWMutex
 	sendAppMetricsArgsForCall []struct {
-		metrics *events.ContainerMetric
+		metrics diego_logging_client.ContainerMetric
 	}
 	sendAppMetricsReturns struct {
 		result1 error
@@ -598,11 +597,11 @@ func (fake *FakeIngressClient) SendAppErrorLogReturnsOnCall(i int, result1 error
 	}{result1}
 }
 
-func (fake *FakeIngressClient) SendAppMetrics(metrics *events.ContainerMetric) error {
+func (fake *FakeIngressClient) SendAppMetrics(metrics diego_logging_client.ContainerMetric) error {
 	fake.sendAppMetricsMutex.Lock()
 	ret, specificReturn := fake.sendAppMetricsReturnsOnCall[len(fake.sendAppMetricsArgsForCall)]
 	fake.sendAppMetricsArgsForCall = append(fake.sendAppMetricsArgsForCall, struct {
-		metrics *events.ContainerMetric
+		metrics diego_logging_client.ContainerMetric
 	}{metrics})
 	fake.recordInvocation("SendAppMetrics", []interface{}{metrics})
 	fake.sendAppMetricsMutex.Unlock()
@@ -621,7 +620,7 @@ func (fake *FakeIngressClient) SendAppMetricsCallCount() int {
 	return len(fake.sendAppMetricsArgsForCall)
 }
 
-func (fake *FakeIngressClient) SendAppMetricsArgsForCall(i int) *events.ContainerMetric {
+func (fake *FakeIngressClient) SendAppMetricsArgsForCall(i int) diego_logging_client.ContainerMetric {
 	fake.sendAppMetricsMutex.RLock()
 	defer fake.sendAppMetricsMutex.RUnlock()
 	return fake.sendAppMetricsArgsForCall[i].metrics
