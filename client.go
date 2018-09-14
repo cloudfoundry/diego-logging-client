@@ -2,6 +2,7 @@ package diego_logging_client
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"google.golang.org/grpc"
@@ -42,6 +43,7 @@ type IngressClient interface {
 	SendAppLog(appID, message, sourceType, sourceInstance string) error
 	SendAppErrorLog(appID, message, sourceType, sourceInstance string) error
 	SendAppMetrics(metrics *events.ContainerMetric) error
+	SendCPUUsage(applicationID string, instanceIndex int, absoluteUsage, absoluteEntitlement, containerAge uint64) error
 	SendComponentMetric(name string, value float64, unit string) error
 }
 
@@ -197,6 +199,17 @@ func (c client) SendAppMetrics(m *events.ContainerMetric) error {
 		loggregator.WithGaugeValue("disk", float64(m.GetDiskBytes()), "bytes"),
 		loggregator.WithGaugeValue("memory_quota", float64(m.GetMemoryBytesQuota()), "bytes"),
 		loggregator.WithGaugeValue("disk_quota", float64(m.GetDiskBytesQuota()), "bytes"),
+	)
+
+	return nil
+}
+
+func (c client) SendCPUUsage(applicationID string, instanceIndex int, absoluteUsage, absoluteEntitlement, containerAge uint64) error {
+	c.client.EmitGauge(
+		loggregator.WithGaugeSourceInfo(applicationID, strconv.Itoa(instanceIndex)),
+		loggregator.WithGaugeValue("absolute_usage", float64(absoluteUsage), "nanoseconds"),
+		loggregator.WithGaugeValue("absolute_entitlement", float64(absoluteEntitlement), "nanoseconds"),
+		loggregator.WithGaugeValue("container_age", float64(containerAge), "nanoseconds"),
 	)
 
 	return nil

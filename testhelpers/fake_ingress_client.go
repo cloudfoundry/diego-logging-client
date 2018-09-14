@@ -135,6 +135,21 @@ type FakeIngressClient struct {
 	sendAppMetricsReturnsOnCall map[int]struct {
 		result1 error
 	}
+	SendCPUUsageStub        func(applicationID string, instanceIndex int, absoluteUsage, absoluteEntitlement, containerAge uint64) error
+	sendCPUUsageMutex       sync.RWMutex
+	sendCPUUsageArgsForCall []struct {
+		applicationID       string
+		instanceIndex       int
+		absoluteUsage       uint64
+		absoluteEntitlement uint64
+		containerAge        uint64
+	}
+	sendCPUUsageReturns struct {
+		result1 error
+	}
+	sendCPUUsageReturnsOnCall map[int]struct {
+		result1 error
+	}
 	SendComponentMetricStub        func(name string, value float64, unit string) error
 	sendComponentMetricMutex       sync.RWMutex
 	sendComponentMetricArgsForCall []struct {
@@ -646,6 +661,58 @@ func (fake *FakeIngressClient) SendAppMetricsReturnsOnCall(i int, result1 error)
 	}{result1}
 }
 
+func (fake *FakeIngressClient) SendCPUUsage(applicationID string, instanceIndex int, absoluteUsage uint64, absoluteEntitlement uint64, containerAge uint64) error {
+	fake.sendCPUUsageMutex.Lock()
+	ret, specificReturn := fake.sendCPUUsageReturnsOnCall[len(fake.sendCPUUsageArgsForCall)]
+	fake.sendCPUUsageArgsForCall = append(fake.sendCPUUsageArgsForCall, struct {
+		applicationID       string
+		instanceIndex       int
+		absoluteUsage       uint64
+		absoluteEntitlement uint64
+		containerAge        uint64
+	}{applicationID, instanceIndex, absoluteUsage, absoluteEntitlement, containerAge})
+	fake.recordInvocation("SendCPUUsage", []interface{}{applicationID, instanceIndex, absoluteUsage, absoluteEntitlement, containerAge})
+	fake.sendCPUUsageMutex.Unlock()
+	if fake.SendCPUUsageStub != nil {
+		return fake.SendCPUUsageStub(applicationID, instanceIndex, absoluteUsage, absoluteEntitlement, containerAge)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.sendCPUUsageReturns.result1
+}
+
+func (fake *FakeIngressClient) SendCPUUsageCallCount() int {
+	fake.sendCPUUsageMutex.RLock()
+	defer fake.sendCPUUsageMutex.RUnlock()
+	return len(fake.sendCPUUsageArgsForCall)
+}
+
+func (fake *FakeIngressClient) SendCPUUsageArgsForCall(i int) (string, int, uint64, uint64, uint64) {
+	fake.sendCPUUsageMutex.RLock()
+	defer fake.sendCPUUsageMutex.RUnlock()
+	return fake.sendCPUUsageArgsForCall[i].applicationID, fake.sendCPUUsageArgsForCall[i].instanceIndex, fake.sendCPUUsageArgsForCall[i].absoluteUsage, fake.sendCPUUsageArgsForCall[i].absoluteEntitlement, fake.sendCPUUsageArgsForCall[i].containerAge
+}
+
+func (fake *FakeIngressClient) SendCPUUsageReturns(result1 error) {
+	fake.SendCPUUsageStub = nil
+	fake.sendCPUUsageReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIngressClient) SendCPUUsageReturnsOnCall(i int, result1 error) {
+	fake.SendCPUUsageStub = nil
+	if fake.sendCPUUsageReturnsOnCall == nil {
+		fake.sendCPUUsageReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.sendCPUUsageReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeIngressClient) SendComponentMetric(name string, value float64, unit string) error {
 	fake.sendComponentMetricMutex.Lock()
 	ret, specificReturn := fake.sendComponentMetricReturnsOnCall[len(fake.sendComponentMetricArgsForCall)]
@@ -719,6 +786,8 @@ func (fake *FakeIngressClient) Invocations() map[string][][]interface{} {
 	defer fake.sendAppErrorLogMutex.RUnlock()
 	fake.sendAppMetricsMutex.RLock()
 	defer fake.sendAppMetricsMutex.RUnlock()
+	fake.sendCPUUsageMutex.RLock()
+	defer fake.sendCPUUsageMutex.RUnlock()
 	fake.sendComponentMetricMutex.RLock()
 	defer fake.sendComponentMetricMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

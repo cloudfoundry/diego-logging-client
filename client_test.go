@@ -84,13 +84,16 @@ var _ = Describe("DiegoLoggingClient", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 
-			assertEnvelopeSourceAndInstanceIDAreCorrect := func() {
+			getEnvelopeBatch := func() *loggregator_v2.EnvelopeBatch {
 				var sender loggregator_v2.Ingress_BatchSenderServer
 				Eventually(testIngressServer.Receivers()).Should(Receive(&sender))
 
 				batch, err := sender.Recv()
 				Expect(err).NotTo(HaveOccurred())
+				return batch
+			}
 
+			assertEnvelopeSourceAndInstanceIDAreCorrect := func(batch *loggregator_v2.EnvelopeBatch) {
 				Expect(batch.Batch).To(HaveLen(1))
 				Expect(batch.Batch[0].GetSourceId()).To(Equal("some-source-id"))
 				Expect(batch.Batch[0].GetInstanceId()).To(Equal("some-instance-id"))
@@ -100,7 +103,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.SendDuration("time", 18*time.Second)).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -108,7 +111,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.SendMebiBytes("disk-free", 23)).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -116,7 +119,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.SendMetric("errors", 3)).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -124,7 +127,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.SendBytesPerSecond("speed", 3)).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -132,7 +135,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.SendRequestsPerSecond("homepage", 37)).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -140,7 +143,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.IncrementCounter("its")).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -148,7 +151,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.IncrementCounterWithDelta("its", 5)).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
 				})
 			})
 
@@ -156,7 +159,34 @@ var _ = Describe("DiegoLoggingClient", func() {
 				It("sets app info", func() {
 					Expect(c.SendComponentMetric("memory", 37, "GB")).To(Succeed())
 
-					assertEnvelopeSourceAndInstanceIDAreCorrect()
+					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
+				})
+			})
+
+			Describe("SendCPUUsage", func() {
+				var batch *loggregator_v2.EnvelopeBatch
+
+				JustBeforeEach(func() {
+					Expect(c.SendCPUUsage("some-source-id", 345, 1, 2, 3)).To(Succeed())
+					batch = getEnvelopeBatch()
+				})
+
+				It("sets app info", func() {
+					Expect(batch.Batch).To(HaveLen(1))
+					Expect(batch.Batch[0].GetSourceId()).To(Equal("some-source-id"))
+					Expect(batch.Batch[0].GetInstanceId()).To(Equal("345"))
+				})
+
+				It("sends cpu usage", func() {
+					metrics := batch.Batch[0].GetGauge().GetMetrics()
+					Expect(metrics["absolute_usage"].GetValue()).To(Equal(float64(1)))
+					Expect(metrics["absolute_usage"].GetUnit()).To(Equal("nanoseconds"))
+
+					Expect(metrics["absolute_entitlement"].GetValue()).To(Equal(float64(2)))
+					Expect(metrics["absolute_entitlement"].GetUnit()).To(Equal("nanoseconds"))
+
+					Expect(metrics["container_age"].GetValue()).To(Equal(float64(3)))
+					Expect(metrics["container_age"].GetUnit()).To(Equal("nanoseconds"))
 				})
 			})
 		})
