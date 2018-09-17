@@ -42,3 +42,6 @@ func (*noopIngressClient) SendAppMetrics(metrics *events.ContainerMetric) error 
 func (*noopIngressClient) SendComponentMetric(name string, value float64, unit string) error {
 	return nil
 }
+func (*noopIngressClient) SendCPUUsage(applicationID string, instanceIndex int, absoluteUsage, absoluteEntitlement, containerAge uint64) error {
+	return nil
+}
