@@ -84,6 +84,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 					CACertPath:         metronCAFile,
 					KeyPath:            metronClientKeyFile,
 					CertPath:           metronClientCertFile,
+					JobOrigin:          "some-origin",
 				})
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -172,9 +173,6 @@ var _ = Describe("DiegoLoggingClient", func() {
 
 				JustBeforeEach(func() {
 					metrics := client.ContainerMetric{
-						ApplicationId: "some-source-id",
-						InstanceIndex: 345,
-
 						MemoryBytes:      50,
 						MemoryBytesQuota: 100,
 
@@ -185,6 +183,11 @@ var _ = Describe("DiegoLoggingClient", func() {
 						AbsoluteCPUUsage:       1,
 						AbsoluteCPUEntitlement: 2,
 						ContainerAge:           3,
+						Tags: map[string]string{
+							"source_id":   "some-source-id",
+							"instance_id": "345",
+							"some-key":    "some-value",
+						},
 					}
 
 					Expect(c.SendAppMetrics(metrics)).To(Succeed())
@@ -228,6 +231,16 @@ var _ = Describe("DiegoLoggingClient", func() {
 
 					Expect(metrics["container_age"].GetValue()).To(Equal(float64(3)))
 					Expect(metrics["container_age"].GetUnit()).To(Equal("nanoseconds"))
+				})
+
+				It("sends tags", func() {
+					Expect(batch.Batch).To(HaveLen(1))
+					Expect(batch.Batch[0].GetTags()).To(Equal(map[string]string{
+						"origin":      "some-origin",
+						"source_id":   "some-source-id",
+						"instance_id": "345",
+						"some-key":    "some-value",
+					}))
 				})
 			})
 		})

@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"google.golang.org/grpc"
-
 	loggregator "code.cloudfoundry.org/go-loggregator"
+	"google.golang.org/grpc"
 )
 
 // Config is the shared configuration between v1 and v2 clients.
@@ -30,8 +29,8 @@ type Config struct {
 
 // A ContainerMetric records resource usage of an app in a container.
 type ContainerMetric struct {
-	ApplicationId          string
-	InstanceIndex          int32
+	ApplicationId          string //deprecated
+	InstanceIndex          int32  //deprecated
 	CpuPercentage          float64
 	MemoryBytes            uint64
 	DiskBytes              uint64
@@ -40,6 +39,7 @@ type ContainerMetric struct {
 	AbsoluteCPUUsage       uint64
 	AbsoluteCPUEntitlement uint64
 	ContainerAge           uint64
+	Tags                   map[string]string
 }
 
 // IngressClient is the shared contract between v1 and v2 clients.
@@ -204,12 +204,13 @@ func (c client) SendAppErrorLog(appID, message, sourceType, sourceInstance strin
 
 func (c client) SendAppMetrics(m ContainerMetric) error {
 	c.client.EmitGauge(
-		loggregator.WithGaugeAppInfo(m.ApplicationId, int(m.InstanceIndex)),
+		loggregator.WithGaugeSourceInfo(m.Tags["source_id"], m.Tags["instance_id"]),
 		loggregator.WithGaugeValue("cpu", m.CpuPercentage, "percentage"),
 		loggregator.WithGaugeValue("memory", float64(m.MemoryBytes), "bytes"),
 		loggregator.WithGaugeValue("disk", float64(m.DiskBytes), "bytes"),
 		loggregator.WithGaugeValue("memory_quota", float64(m.MemoryBytesQuota), "bytes"),
 		loggregator.WithGaugeValue("disk_quota", float64(m.DiskBytesQuota), "bytes"),
+		loggregator.WithEnvelopeTags(m.Tags),
 	)
 
 	// Emit the new metrics in a separate envelope.  Loggregator will convert a
@@ -220,10 +221,11 @@ func (c client) SendAppMetrics(m ContainerMetric) error {
 	// Loggregator will emit each value in a separate envelope for v1
 	// subscribers.
 	c.client.EmitGauge(
-		loggregator.WithGaugeAppInfo(m.ApplicationId, int(m.InstanceIndex)),
+		loggregator.WithGaugeSourceInfo(m.Tags["source_id"], m.Tags["instance_id"]),
 		loggregator.WithGaugeValue("absolute_usage", float64(m.AbsoluteCPUUsage), "nanoseconds"),
 		loggregator.WithGaugeValue("absolute_entitlement", float64(m.AbsoluteCPUEntitlement), "nanoseconds"),
 		loggregator.WithGaugeValue("container_age", float64(m.ContainerAge), "nanoseconds"),
+		loggregator.WithEnvelopeTags(m.Tags),
 	)
 
 	return nil
