@@ -52,8 +52,8 @@ type IngressClient interface {
 	SendRequestsPerSecond(name string, value float64) error
 	IncrementCounter(name string) error
 	IncrementCounterWithDelta(name string, value uint64) error
-	SendAppLog(appID, message, sourceType, sourceInstance string) error
-	SendAppErrorLog(appID, message, sourceType, sourceInstance string) error
+	SendAppLog(message, sourceType string, tags map[string]string) error
+	SendAppErrorLog(message, sourceType string, tags map[string]string) error
 	SendAppMetrics(metrics ContainerMetric) error
 	SendComponentMetric(name string, value float64, unit string) error
 }
@@ -185,19 +185,21 @@ func (c client) IncrementCounterWithDelta(name string, value uint64) error {
 	return nil
 }
 
-func (c client) SendAppLog(appID, message, sourceType, sourceInstance string) error {
+func (c client) SendAppLog(message, sourceType string, tags map[string]string) error {
 	c.client.EmitLog(
 		message,
-		loggregator.WithAppInfo(appID, sourceType, sourceInstance),
+		loggregator.WithAppInfo(tags["source_id"], sourceType, tags["instance_id"]),
+		loggregator.WithEnvelopeTags(tags),
 		loggregator.WithStdout(),
 	)
 	return nil
 }
 
-func (c client) SendAppErrorLog(appID, message, sourceType, sourceInstance string) error {
+func (c client) SendAppErrorLog(message, sourceType string, tags map[string]string) error {
 	c.client.EmitLog(
 		message,
-		loggregator.WithAppInfo(appID, sourceType, sourceInstance),
+		loggregator.WithAppInfo(tags["source_id"], sourceType, tags["instance_id"]),
+		loggregator.WithEnvelopeTags(tags),
 	)
 	return nil
 }

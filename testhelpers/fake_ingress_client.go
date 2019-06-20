@@ -6,76 +6,14 @@ import (
 	"time"
 
 	diego_logging_client "code.cloudfoundry.org/diego-logging-client"
-	"code.cloudfoundry.org/go-loggregator"
+	loggregator "code.cloudfoundry.org/go-loggregator"
 )
 
 type FakeIngressClient struct {
-	SendDurationStub        func(name string, value time.Duration, opts ...loggregator.EmitGaugeOption) error
-	sendDurationMutex       sync.RWMutex
-	sendDurationArgsForCall []struct {
-		name  string
-		value time.Duration
-		opts  []loggregator.EmitGaugeOption
-	}
-	sendDurationReturns struct {
-		result1 error
-	}
-	sendDurationReturnsOnCall map[int]struct {
-		result1 error
-	}
-	SendMebiBytesStub        func(name string, value int) error
-	sendMebiBytesMutex       sync.RWMutex
-	sendMebiBytesArgsForCall []struct {
-		name  string
-		value int
-	}
-	sendMebiBytesReturns struct {
-		result1 error
-	}
-	sendMebiBytesReturnsOnCall map[int]struct {
-		result1 error
-	}
-	SendMetricStub        func(name string, value int, opts ...loggregator.EmitGaugeOption) error
-	sendMetricMutex       sync.RWMutex
-	sendMetricArgsForCall []struct {
-		name  string
-		value int
-		opts  []loggregator.EmitGaugeOption
-	}
-	sendMetricReturns struct {
-		result1 error
-	}
-	sendMetricReturnsOnCall map[int]struct {
-		result1 error
-	}
-	SendBytesPerSecondStub        func(name string, value float64) error
-	sendBytesPerSecondMutex       sync.RWMutex
-	sendBytesPerSecondArgsForCall []struct {
-		name  string
-		value float64
-	}
-	sendBytesPerSecondReturns struct {
-		result1 error
-	}
-	sendBytesPerSecondReturnsOnCall map[int]struct {
-		result1 error
-	}
-	SendRequestsPerSecondStub        func(name string, value float64) error
-	sendRequestsPerSecondMutex       sync.RWMutex
-	sendRequestsPerSecondArgsForCall []struct {
-		name  string
-		value float64
-	}
-	sendRequestsPerSecondReturns struct {
-		result1 error
-	}
-	sendRequestsPerSecondReturnsOnCall map[int]struct {
-		result1 error
-	}
-	IncrementCounterStub        func(name string) error
+	IncrementCounterStub        func(string) error
 	incrementCounterMutex       sync.RWMutex
 	incrementCounterArgsForCall []struct {
-		name string
+		arg1 string
 	}
 	incrementCounterReturns struct {
 		result1 error
@@ -83,11 +21,11 @@ type FakeIngressClient struct {
 	incrementCounterReturnsOnCall map[int]struct {
 		result1 error
 	}
-	IncrementCounterWithDeltaStub        func(name string, value uint64) error
+	IncrementCounterWithDeltaStub        func(string, uint64) error
 	incrementCounterWithDeltaMutex       sync.RWMutex
 	incrementCounterWithDeltaArgsForCall []struct {
-		name  string
-		value uint64
+		arg1 string
+		arg2 uint64
 	}
 	incrementCounterWithDeltaReturns struct {
 		result1 error
@@ -95,27 +33,12 @@ type FakeIngressClient struct {
 	incrementCounterWithDeltaReturnsOnCall map[int]struct {
 		result1 error
 	}
-	SendAppLogStub        func(appID, message, sourceType, sourceInstance string) error
-	sendAppLogMutex       sync.RWMutex
-	sendAppLogArgsForCall []struct {
-		appID          string
-		message        string
-		sourceType     string
-		sourceInstance string
-	}
-	sendAppLogReturns struct {
-		result1 error
-	}
-	sendAppLogReturnsOnCall map[int]struct {
-		result1 error
-	}
-	SendAppErrorLogStub        func(appID, message, sourceType, sourceInstance string) error
+	SendAppErrorLogStub        func(string, string, map[string]string) error
 	sendAppErrorLogMutex       sync.RWMutex
 	sendAppErrorLogArgsForCall []struct {
-		appID          string
-		message        string
-		sourceType     string
-		sourceInstance string
+		arg1 string
+		arg2 string
+		arg3 map[string]string
 	}
 	sendAppErrorLogReturns struct {
 		result1 error
@@ -123,10 +46,23 @@ type FakeIngressClient struct {
 	sendAppErrorLogReturnsOnCall map[int]struct {
 		result1 error
 	}
-	SendAppMetricsStub        func(metrics diego_logging_client.ContainerMetric) error
+	SendAppLogStub        func(string, string, map[string]string) error
+	sendAppLogMutex       sync.RWMutex
+	sendAppLogArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 map[string]string
+	}
+	sendAppLogReturns struct {
+		result1 error
+	}
+	sendAppLogReturnsOnCall map[int]struct {
+		result1 error
+	}
+	SendAppMetricsStub        func(diego_logging_client.ContainerMetric) error
 	sendAppMetricsMutex       sync.RWMutex
 	sendAppMetricsArgsForCall []struct {
-		metrics diego_logging_client.ContainerMetric
+		arg1 diego_logging_client.ContainerMetric
 	}
 	sendAppMetricsReturns struct {
 		result1 error
@@ -134,12 +70,24 @@ type FakeIngressClient struct {
 	sendAppMetricsReturnsOnCall map[int]struct {
 		result1 error
 	}
-	SendComponentMetricStub        func(name string, value float64, unit string) error
+	SendBytesPerSecondStub        func(string, float64) error
+	sendBytesPerSecondMutex       sync.RWMutex
+	sendBytesPerSecondArgsForCall []struct {
+		arg1 string
+		arg2 float64
+	}
+	sendBytesPerSecondReturns struct {
+		result1 error
+	}
+	sendBytesPerSecondReturnsOnCall map[int]struct {
+		result1 error
+	}
+	SendComponentMetricStub        func(string, float64, string) error
 	sendComponentMetricMutex       sync.RWMutex
 	sendComponentMetricArgsForCall []struct {
-		name  string
-		value float64
-		unit  string
+		arg1 string
+		arg2 float64
+		arg3 string
 	}
 	sendComponentMetricReturns struct {
 		result1 error
@@ -147,272 +95,76 @@ type FakeIngressClient struct {
 	sendComponentMetricReturnsOnCall map[int]struct {
 		result1 error
 	}
+	SendDurationStub        func(string, time.Duration, ...loggregator.EmitGaugeOption) error
+	sendDurationMutex       sync.RWMutex
+	sendDurationArgsForCall []struct {
+		arg1 string
+		arg2 time.Duration
+		arg3 []loggregator.EmitGaugeOption
+	}
+	sendDurationReturns struct {
+		result1 error
+	}
+	sendDurationReturnsOnCall map[int]struct {
+		result1 error
+	}
+	SendMebiBytesStub        func(string, int) error
+	sendMebiBytesMutex       sync.RWMutex
+	sendMebiBytesArgsForCall []struct {
+		arg1 string
+		arg2 int
+	}
+	sendMebiBytesReturns struct {
+		result1 error
+	}
+	sendMebiBytesReturnsOnCall map[int]struct {
+		result1 error
+	}
+	SendMetricStub        func(string, int, ...loggregator.EmitGaugeOption) error
+	sendMetricMutex       sync.RWMutex
+	sendMetricArgsForCall []struct {
+		arg1 string
+		arg2 int
+		arg3 []loggregator.EmitGaugeOption
+	}
+	sendMetricReturns struct {
+		result1 error
+	}
+	sendMetricReturnsOnCall map[int]struct {
+		result1 error
+	}
+	SendRequestsPerSecondStub        func(string, float64) error
+	sendRequestsPerSecondMutex       sync.RWMutex
+	sendRequestsPerSecondArgsForCall []struct {
+		arg1 string
+		arg2 float64
+	}
+	sendRequestsPerSecondReturns struct {
+		result1 error
+	}
+	sendRequestsPerSecondReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeIngressClient) SendDuration(name string, value time.Duration, opts ...loggregator.EmitGaugeOption) error {
-	fake.sendDurationMutex.Lock()
-	ret, specificReturn := fake.sendDurationReturnsOnCall[len(fake.sendDurationArgsForCall)]
-	fake.sendDurationArgsForCall = append(fake.sendDurationArgsForCall, struct {
-		name  string
-		value time.Duration
-		opts  []loggregator.EmitGaugeOption
-	}{name, value, opts})
-	fake.recordInvocation("SendDuration", []interface{}{name, value, opts})
-	fake.sendDurationMutex.Unlock()
-	if fake.SendDurationStub != nil {
-		return fake.SendDurationStub(name, value, opts...)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.sendDurationReturns.result1
-}
-
-func (fake *FakeIngressClient) SendDurationCallCount() int {
-	fake.sendDurationMutex.RLock()
-	defer fake.sendDurationMutex.RUnlock()
-	return len(fake.sendDurationArgsForCall)
-}
-
-func (fake *FakeIngressClient) SendDurationArgsForCall(i int) (string, time.Duration, []loggregator.EmitGaugeOption) {
-	fake.sendDurationMutex.RLock()
-	defer fake.sendDurationMutex.RUnlock()
-	return fake.sendDurationArgsForCall[i].name, fake.sendDurationArgsForCall[i].value, fake.sendDurationArgsForCall[i].opts
-}
-
-func (fake *FakeIngressClient) SendDurationReturns(result1 error) {
-	fake.SendDurationStub = nil
-	fake.sendDurationReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIngressClient) SendDurationReturnsOnCall(i int, result1 error) {
-	fake.SendDurationStub = nil
-	if fake.sendDurationReturnsOnCall == nil {
-		fake.sendDurationReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.sendDurationReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIngressClient) SendMebiBytes(name string, value int) error {
-	fake.sendMebiBytesMutex.Lock()
-	ret, specificReturn := fake.sendMebiBytesReturnsOnCall[len(fake.sendMebiBytesArgsForCall)]
-	fake.sendMebiBytesArgsForCall = append(fake.sendMebiBytesArgsForCall, struct {
-		name  string
-		value int
-	}{name, value})
-	fake.recordInvocation("SendMebiBytes", []interface{}{name, value})
-	fake.sendMebiBytesMutex.Unlock()
-	if fake.SendMebiBytesStub != nil {
-		return fake.SendMebiBytesStub(name, value)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.sendMebiBytesReturns.result1
-}
-
-func (fake *FakeIngressClient) SendMebiBytesCallCount() int {
-	fake.sendMebiBytesMutex.RLock()
-	defer fake.sendMebiBytesMutex.RUnlock()
-	return len(fake.sendMebiBytesArgsForCall)
-}
-
-func (fake *FakeIngressClient) SendMebiBytesArgsForCall(i int) (string, int) {
-	fake.sendMebiBytesMutex.RLock()
-	defer fake.sendMebiBytesMutex.RUnlock()
-	return fake.sendMebiBytesArgsForCall[i].name, fake.sendMebiBytesArgsForCall[i].value
-}
-
-func (fake *FakeIngressClient) SendMebiBytesReturns(result1 error) {
-	fake.SendMebiBytesStub = nil
-	fake.sendMebiBytesReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIngressClient) SendMebiBytesReturnsOnCall(i int, result1 error) {
-	fake.SendMebiBytesStub = nil
-	if fake.sendMebiBytesReturnsOnCall == nil {
-		fake.sendMebiBytesReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.sendMebiBytesReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIngressClient) SendMetric(name string, value int, opts ...loggregator.EmitGaugeOption) error {
-	fake.sendMetricMutex.Lock()
-	ret, specificReturn := fake.sendMetricReturnsOnCall[len(fake.sendMetricArgsForCall)]
-	fake.sendMetricArgsForCall = append(fake.sendMetricArgsForCall, struct {
-		name  string
-		value int
-		opts  []loggregator.EmitGaugeOption
-	}{name, value, opts})
-	fake.recordInvocation("SendMetric", []interface{}{name, value, opts})
-	fake.sendMetricMutex.Unlock()
-	if fake.SendMetricStub != nil {
-		return fake.SendMetricStub(name, value, opts...)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.sendMetricReturns.result1
-}
-
-func (fake *FakeIngressClient) SendMetricCallCount() int {
-	fake.sendMetricMutex.RLock()
-	defer fake.sendMetricMutex.RUnlock()
-	return len(fake.sendMetricArgsForCall)
-}
-
-func (fake *FakeIngressClient) SendMetricArgsForCall(i int) (string, int, []loggregator.EmitGaugeOption) {
-	fake.sendMetricMutex.RLock()
-	defer fake.sendMetricMutex.RUnlock()
-	return fake.sendMetricArgsForCall[i].name, fake.sendMetricArgsForCall[i].value, fake.sendMetricArgsForCall[i].opts
-}
-
-func (fake *FakeIngressClient) SendMetricReturns(result1 error) {
-	fake.SendMetricStub = nil
-	fake.sendMetricReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIngressClient) SendMetricReturnsOnCall(i int, result1 error) {
-	fake.SendMetricStub = nil
-	if fake.sendMetricReturnsOnCall == nil {
-		fake.sendMetricReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.sendMetricReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIngressClient) SendBytesPerSecond(name string, value float64) error {
-	fake.sendBytesPerSecondMutex.Lock()
-	ret, specificReturn := fake.sendBytesPerSecondReturnsOnCall[len(fake.sendBytesPerSecondArgsForCall)]
-	fake.sendBytesPerSecondArgsForCall = append(fake.sendBytesPerSecondArgsForCall, struct {
-		name  string
-		value float64
-	}{name, value})
-	fake.recordInvocation("SendBytesPerSecond", []interface{}{name, value})
-	fake.sendBytesPerSecondMutex.Unlock()
-	if fake.SendBytesPerSecondStub != nil {
-		return fake.SendBytesPerSecondStub(name, value)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.sendBytesPerSecondReturns.result1
-}
-
-func (fake *FakeIngressClient) SendBytesPerSecondCallCount() int {
-	fake.sendBytesPerSecondMutex.RLock()
-	defer fake.sendBytesPerSecondMutex.RUnlock()
-	return len(fake.sendBytesPerSecondArgsForCall)
-}
-
-func (fake *FakeIngressClient) SendBytesPerSecondArgsForCall(i int) (string, float64) {
-	fake.sendBytesPerSecondMutex.RLock()
-	defer fake.sendBytesPerSecondMutex.RUnlock()
-	return fake.sendBytesPerSecondArgsForCall[i].name, fake.sendBytesPerSecondArgsForCall[i].value
-}
-
-func (fake *FakeIngressClient) SendBytesPerSecondReturns(result1 error) {
-	fake.SendBytesPerSecondStub = nil
-	fake.sendBytesPerSecondReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIngressClient) SendBytesPerSecondReturnsOnCall(i int, result1 error) {
-	fake.SendBytesPerSecondStub = nil
-	if fake.sendBytesPerSecondReturnsOnCall == nil {
-		fake.sendBytesPerSecondReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.sendBytesPerSecondReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIngressClient) SendRequestsPerSecond(name string, value float64) error {
-	fake.sendRequestsPerSecondMutex.Lock()
-	ret, specificReturn := fake.sendRequestsPerSecondReturnsOnCall[len(fake.sendRequestsPerSecondArgsForCall)]
-	fake.sendRequestsPerSecondArgsForCall = append(fake.sendRequestsPerSecondArgsForCall, struct {
-		name  string
-		value float64
-	}{name, value})
-	fake.recordInvocation("SendRequestsPerSecond", []interface{}{name, value})
-	fake.sendRequestsPerSecondMutex.Unlock()
-	if fake.SendRequestsPerSecondStub != nil {
-		return fake.SendRequestsPerSecondStub(name, value)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.sendRequestsPerSecondReturns.result1
-}
-
-func (fake *FakeIngressClient) SendRequestsPerSecondCallCount() int {
-	fake.sendRequestsPerSecondMutex.RLock()
-	defer fake.sendRequestsPerSecondMutex.RUnlock()
-	return len(fake.sendRequestsPerSecondArgsForCall)
-}
-
-func (fake *FakeIngressClient) SendRequestsPerSecondArgsForCall(i int) (string, float64) {
-	fake.sendRequestsPerSecondMutex.RLock()
-	defer fake.sendRequestsPerSecondMutex.RUnlock()
-	return fake.sendRequestsPerSecondArgsForCall[i].name, fake.sendRequestsPerSecondArgsForCall[i].value
-}
-
-func (fake *FakeIngressClient) SendRequestsPerSecondReturns(result1 error) {
-	fake.SendRequestsPerSecondStub = nil
-	fake.sendRequestsPerSecondReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIngressClient) SendRequestsPerSecondReturnsOnCall(i int, result1 error) {
-	fake.SendRequestsPerSecondStub = nil
-	if fake.sendRequestsPerSecondReturnsOnCall == nil {
-		fake.sendRequestsPerSecondReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.sendRequestsPerSecondReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIngressClient) IncrementCounter(name string) error {
+func (fake *FakeIngressClient) IncrementCounter(arg1 string) error {
 	fake.incrementCounterMutex.Lock()
 	ret, specificReturn := fake.incrementCounterReturnsOnCall[len(fake.incrementCounterArgsForCall)]
 	fake.incrementCounterArgsForCall = append(fake.incrementCounterArgsForCall, struct {
-		name string
-	}{name})
-	fake.recordInvocation("IncrementCounter", []interface{}{name})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("IncrementCounter", []interface{}{arg1})
 	fake.incrementCounterMutex.Unlock()
 	if fake.IncrementCounterStub != nil {
-		return fake.IncrementCounterStub(name)
+		return fake.IncrementCounterStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.incrementCounterReturns.result1
+	fakeReturns := fake.incrementCounterReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeIngressClient) IncrementCounterCallCount() int {
@@ -421,13 +173,22 @@ func (fake *FakeIngressClient) IncrementCounterCallCount() int {
 	return len(fake.incrementCounterArgsForCall)
 }
 
+func (fake *FakeIngressClient) IncrementCounterCalls(stub func(string) error) {
+	fake.incrementCounterMutex.Lock()
+	defer fake.incrementCounterMutex.Unlock()
+	fake.IncrementCounterStub = stub
+}
+
 func (fake *FakeIngressClient) IncrementCounterArgsForCall(i int) string {
 	fake.incrementCounterMutex.RLock()
 	defer fake.incrementCounterMutex.RUnlock()
-	return fake.incrementCounterArgsForCall[i].name
+	argsForCall := fake.incrementCounterArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeIngressClient) IncrementCounterReturns(result1 error) {
+	fake.incrementCounterMutex.Lock()
+	defer fake.incrementCounterMutex.Unlock()
 	fake.IncrementCounterStub = nil
 	fake.incrementCounterReturns = struct {
 		result1 error
@@ -435,6 +196,8 @@ func (fake *FakeIngressClient) IncrementCounterReturns(result1 error) {
 }
 
 func (fake *FakeIngressClient) IncrementCounterReturnsOnCall(i int, result1 error) {
+	fake.incrementCounterMutex.Lock()
+	defer fake.incrementCounterMutex.Unlock()
 	fake.IncrementCounterStub = nil
 	if fake.incrementCounterReturnsOnCall == nil {
 		fake.incrementCounterReturnsOnCall = make(map[int]struct {
@@ -446,22 +209,23 @@ func (fake *FakeIngressClient) IncrementCounterReturnsOnCall(i int, result1 erro
 	}{result1}
 }
 
-func (fake *FakeIngressClient) IncrementCounterWithDelta(name string, value uint64) error {
+func (fake *FakeIngressClient) IncrementCounterWithDelta(arg1 string, arg2 uint64) error {
 	fake.incrementCounterWithDeltaMutex.Lock()
 	ret, specificReturn := fake.incrementCounterWithDeltaReturnsOnCall[len(fake.incrementCounterWithDeltaArgsForCall)]
 	fake.incrementCounterWithDeltaArgsForCall = append(fake.incrementCounterWithDeltaArgsForCall, struct {
-		name  string
-		value uint64
-	}{name, value})
-	fake.recordInvocation("IncrementCounterWithDelta", []interface{}{name, value})
+		arg1 string
+		arg2 uint64
+	}{arg1, arg2})
+	fake.recordInvocation("IncrementCounterWithDelta", []interface{}{arg1, arg2})
 	fake.incrementCounterWithDeltaMutex.Unlock()
 	if fake.IncrementCounterWithDeltaStub != nil {
-		return fake.IncrementCounterWithDeltaStub(name, value)
+		return fake.IncrementCounterWithDeltaStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.incrementCounterWithDeltaReturns.result1
+	fakeReturns := fake.incrementCounterWithDeltaReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeIngressClient) IncrementCounterWithDeltaCallCount() int {
@@ -470,13 +234,22 @@ func (fake *FakeIngressClient) IncrementCounterWithDeltaCallCount() int {
 	return len(fake.incrementCounterWithDeltaArgsForCall)
 }
 
+func (fake *FakeIngressClient) IncrementCounterWithDeltaCalls(stub func(string, uint64) error) {
+	fake.incrementCounterWithDeltaMutex.Lock()
+	defer fake.incrementCounterWithDeltaMutex.Unlock()
+	fake.IncrementCounterWithDeltaStub = stub
+}
+
 func (fake *FakeIngressClient) IncrementCounterWithDeltaArgsForCall(i int) (string, uint64) {
 	fake.incrementCounterWithDeltaMutex.RLock()
 	defer fake.incrementCounterWithDeltaMutex.RUnlock()
-	return fake.incrementCounterWithDeltaArgsForCall[i].name, fake.incrementCounterWithDeltaArgsForCall[i].value
+	argsForCall := fake.incrementCounterWithDeltaArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeIngressClient) IncrementCounterWithDeltaReturns(result1 error) {
+	fake.incrementCounterWithDeltaMutex.Lock()
+	defer fake.incrementCounterWithDeltaMutex.Unlock()
 	fake.IncrementCounterWithDeltaStub = nil
 	fake.incrementCounterWithDeltaReturns = struct {
 		result1 error
@@ -484,6 +257,8 @@ func (fake *FakeIngressClient) IncrementCounterWithDeltaReturns(result1 error) {
 }
 
 func (fake *FakeIngressClient) IncrementCounterWithDeltaReturnsOnCall(i int, result1 error) {
+	fake.incrementCounterWithDeltaMutex.Lock()
+	defer fake.incrementCounterWithDeltaMutex.Unlock()
 	fake.IncrementCounterWithDeltaStub = nil
 	if fake.incrementCounterWithDeltaReturnsOnCall == nil {
 		fake.incrementCounterWithDeltaReturnsOnCall = make(map[int]struct {
@@ -495,75 +270,24 @@ func (fake *FakeIngressClient) IncrementCounterWithDeltaReturnsOnCall(i int, res
 	}{result1}
 }
 
-func (fake *FakeIngressClient) SendAppLog(appID string, message string, sourceType string, sourceInstance string) error {
-	fake.sendAppLogMutex.Lock()
-	ret, specificReturn := fake.sendAppLogReturnsOnCall[len(fake.sendAppLogArgsForCall)]
-	fake.sendAppLogArgsForCall = append(fake.sendAppLogArgsForCall, struct {
-		appID          string
-		message        string
-		sourceType     string
-		sourceInstance string
-	}{appID, message, sourceType, sourceInstance})
-	fake.recordInvocation("SendAppLog", []interface{}{appID, message, sourceType, sourceInstance})
-	fake.sendAppLogMutex.Unlock()
-	if fake.SendAppLogStub != nil {
-		return fake.SendAppLogStub(appID, message, sourceType, sourceInstance)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.sendAppLogReturns.result1
-}
-
-func (fake *FakeIngressClient) SendAppLogCallCount() int {
-	fake.sendAppLogMutex.RLock()
-	defer fake.sendAppLogMutex.RUnlock()
-	return len(fake.sendAppLogArgsForCall)
-}
-
-func (fake *FakeIngressClient) SendAppLogArgsForCall(i int) (string, string, string, string) {
-	fake.sendAppLogMutex.RLock()
-	defer fake.sendAppLogMutex.RUnlock()
-	return fake.sendAppLogArgsForCall[i].appID, fake.sendAppLogArgsForCall[i].message, fake.sendAppLogArgsForCall[i].sourceType, fake.sendAppLogArgsForCall[i].sourceInstance
-}
-
-func (fake *FakeIngressClient) SendAppLogReturns(result1 error) {
-	fake.SendAppLogStub = nil
-	fake.sendAppLogReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIngressClient) SendAppLogReturnsOnCall(i int, result1 error) {
-	fake.SendAppLogStub = nil
-	if fake.sendAppLogReturnsOnCall == nil {
-		fake.sendAppLogReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.sendAppLogReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIngressClient) SendAppErrorLog(appID string, message string, sourceType string, sourceInstance string) error {
+func (fake *FakeIngressClient) SendAppErrorLog(arg1 string, arg2 string, arg3 map[string]string) error {
 	fake.sendAppErrorLogMutex.Lock()
 	ret, specificReturn := fake.sendAppErrorLogReturnsOnCall[len(fake.sendAppErrorLogArgsForCall)]
 	fake.sendAppErrorLogArgsForCall = append(fake.sendAppErrorLogArgsForCall, struct {
-		appID          string
-		message        string
-		sourceType     string
-		sourceInstance string
-	}{appID, message, sourceType, sourceInstance})
-	fake.recordInvocation("SendAppErrorLog", []interface{}{appID, message, sourceType, sourceInstance})
+		arg1 string
+		arg2 string
+		arg3 map[string]string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("SendAppErrorLog", []interface{}{arg1, arg2, arg3})
 	fake.sendAppErrorLogMutex.Unlock()
 	if fake.SendAppErrorLogStub != nil {
-		return fake.SendAppErrorLogStub(appID, message, sourceType, sourceInstance)
+		return fake.SendAppErrorLogStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.sendAppErrorLogReturns.result1
+	fakeReturns := fake.sendAppErrorLogReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeIngressClient) SendAppErrorLogCallCount() int {
@@ -572,13 +296,22 @@ func (fake *FakeIngressClient) SendAppErrorLogCallCount() int {
 	return len(fake.sendAppErrorLogArgsForCall)
 }
 
-func (fake *FakeIngressClient) SendAppErrorLogArgsForCall(i int) (string, string, string, string) {
+func (fake *FakeIngressClient) SendAppErrorLogCalls(stub func(string, string, map[string]string) error) {
+	fake.sendAppErrorLogMutex.Lock()
+	defer fake.sendAppErrorLogMutex.Unlock()
+	fake.SendAppErrorLogStub = stub
+}
+
+func (fake *FakeIngressClient) SendAppErrorLogArgsForCall(i int) (string, string, map[string]string) {
 	fake.sendAppErrorLogMutex.RLock()
 	defer fake.sendAppErrorLogMutex.RUnlock()
-	return fake.sendAppErrorLogArgsForCall[i].appID, fake.sendAppErrorLogArgsForCall[i].message, fake.sendAppErrorLogArgsForCall[i].sourceType, fake.sendAppErrorLogArgsForCall[i].sourceInstance
+	argsForCall := fake.sendAppErrorLogArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeIngressClient) SendAppErrorLogReturns(result1 error) {
+	fake.sendAppErrorLogMutex.Lock()
+	defer fake.sendAppErrorLogMutex.Unlock()
 	fake.SendAppErrorLogStub = nil
 	fake.sendAppErrorLogReturns = struct {
 		result1 error
@@ -586,6 +319,8 @@ func (fake *FakeIngressClient) SendAppErrorLogReturns(result1 error) {
 }
 
 func (fake *FakeIngressClient) SendAppErrorLogReturnsOnCall(i int, result1 error) {
+	fake.sendAppErrorLogMutex.Lock()
+	defer fake.sendAppErrorLogMutex.Unlock()
 	fake.SendAppErrorLogStub = nil
 	if fake.sendAppErrorLogReturnsOnCall == nil {
 		fake.sendAppErrorLogReturnsOnCall = make(map[int]struct {
@@ -597,21 +332,84 @@ func (fake *FakeIngressClient) SendAppErrorLogReturnsOnCall(i int, result1 error
 	}{result1}
 }
 
-func (fake *FakeIngressClient) SendAppMetrics(metrics diego_logging_client.ContainerMetric) error {
-	fake.sendAppMetricsMutex.Lock()
-	ret, specificReturn := fake.sendAppMetricsReturnsOnCall[len(fake.sendAppMetricsArgsForCall)]
-	fake.sendAppMetricsArgsForCall = append(fake.sendAppMetricsArgsForCall, struct {
-		metrics diego_logging_client.ContainerMetric
-	}{metrics})
-	fake.recordInvocation("SendAppMetrics", []interface{}{metrics})
-	fake.sendAppMetricsMutex.Unlock()
-	if fake.SendAppMetricsStub != nil {
-		return fake.SendAppMetricsStub(metrics)
+func (fake *FakeIngressClient) SendAppLog(arg1 string, arg2 string, arg3 map[string]string) error {
+	fake.sendAppLogMutex.Lock()
+	ret, specificReturn := fake.sendAppLogReturnsOnCall[len(fake.sendAppLogArgsForCall)]
+	fake.sendAppLogArgsForCall = append(fake.sendAppLogArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 map[string]string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("SendAppLog", []interface{}{arg1, arg2, arg3})
+	fake.sendAppLogMutex.Unlock()
+	if fake.SendAppLogStub != nil {
+		return fake.SendAppLogStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.sendAppMetricsReturns.result1
+	fakeReturns := fake.sendAppLogReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeIngressClient) SendAppLogCallCount() int {
+	fake.sendAppLogMutex.RLock()
+	defer fake.sendAppLogMutex.RUnlock()
+	return len(fake.sendAppLogArgsForCall)
+}
+
+func (fake *FakeIngressClient) SendAppLogCalls(stub func(string, string, map[string]string) error) {
+	fake.sendAppLogMutex.Lock()
+	defer fake.sendAppLogMutex.Unlock()
+	fake.SendAppLogStub = stub
+}
+
+func (fake *FakeIngressClient) SendAppLogArgsForCall(i int) (string, string, map[string]string) {
+	fake.sendAppLogMutex.RLock()
+	defer fake.sendAppLogMutex.RUnlock()
+	argsForCall := fake.sendAppLogArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeIngressClient) SendAppLogReturns(result1 error) {
+	fake.sendAppLogMutex.Lock()
+	defer fake.sendAppLogMutex.Unlock()
+	fake.SendAppLogStub = nil
+	fake.sendAppLogReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIngressClient) SendAppLogReturnsOnCall(i int, result1 error) {
+	fake.sendAppLogMutex.Lock()
+	defer fake.sendAppLogMutex.Unlock()
+	fake.SendAppLogStub = nil
+	if fake.sendAppLogReturnsOnCall == nil {
+		fake.sendAppLogReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.sendAppLogReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIngressClient) SendAppMetrics(arg1 diego_logging_client.ContainerMetric) error {
+	fake.sendAppMetricsMutex.Lock()
+	ret, specificReturn := fake.sendAppMetricsReturnsOnCall[len(fake.sendAppMetricsArgsForCall)]
+	fake.sendAppMetricsArgsForCall = append(fake.sendAppMetricsArgsForCall, struct {
+		arg1 diego_logging_client.ContainerMetric
+	}{arg1})
+	fake.recordInvocation("SendAppMetrics", []interface{}{arg1})
+	fake.sendAppMetricsMutex.Unlock()
+	if fake.SendAppMetricsStub != nil {
+		return fake.SendAppMetricsStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.sendAppMetricsReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeIngressClient) SendAppMetricsCallCount() int {
@@ -620,13 +418,22 @@ func (fake *FakeIngressClient) SendAppMetricsCallCount() int {
 	return len(fake.sendAppMetricsArgsForCall)
 }
 
+func (fake *FakeIngressClient) SendAppMetricsCalls(stub func(diego_logging_client.ContainerMetric) error) {
+	fake.sendAppMetricsMutex.Lock()
+	defer fake.sendAppMetricsMutex.Unlock()
+	fake.SendAppMetricsStub = stub
+}
+
 func (fake *FakeIngressClient) SendAppMetricsArgsForCall(i int) diego_logging_client.ContainerMetric {
 	fake.sendAppMetricsMutex.RLock()
 	defer fake.sendAppMetricsMutex.RUnlock()
-	return fake.sendAppMetricsArgsForCall[i].metrics
+	argsForCall := fake.sendAppMetricsArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeIngressClient) SendAppMetricsReturns(result1 error) {
+	fake.sendAppMetricsMutex.Lock()
+	defer fake.sendAppMetricsMutex.Unlock()
 	fake.SendAppMetricsStub = nil
 	fake.sendAppMetricsReturns = struct {
 		result1 error
@@ -634,6 +441,8 @@ func (fake *FakeIngressClient) SendAppMetricsReturns(result1 error) {
 }
 
 func (fake *FakeIngressClient) SendAppMetricsReturnsOnCall(i int, result1 error) {
+	fake.sendAppMetricsMutex.Lock()
+	defer fake.sendAppMetricsMutex.Unlock()
 	fake.SendAppMetricsStub = nil
 	if fake.sendAppMetricsReturnsOnCall == nil {
 		fake.sendAppMetricsReturnsOnCall = make(map[int]struct {
@@ -645,23 +454,85 @@ func (fake *FakeIngressClient) SendAppMetricsReturnsOnCall(i int, result1 error)
 	}{result1}
 }
 
-func (fake *FakeIngressClient) SendComponentMetric(name string, value float64, unit string) error {
-	fake.sendComponentMetricMutex.Lock()
-	ret, specificReturn := fake.sendComponentMetricReturnsOnCall[len(fake.sendComponentMetricArgsForCall)]
-	fake.sendComponentMetricArgsForCall = append(fake.sendComponentMetricArgsForCall, struct {
-		name  string
-		value float64
-		unit  string
-	}{name, value, unit})
-	fake.recordInvocation("SendComponentMetric", []interface{}{name, value, unit})
-	fake.sendComponentMetricMutex.Unlock()
-	if fake.SendComponentMetricStub != nil {
-		return fake.SendComponentMetricStub(name, value, unit)
+func (fake *FakeIngressClient) SendBytesPerSecond(arg1 string, arg2 float64) error {
+	fake.sendBytesPerSecondMutex.Lock()
+	ret, specificReturn := fake.sendBytesPerSecondReturnsOnCall[len(fake.sendBytesPerSecondArgsForCall)]
+	fake.sendBytesPerSecondArgsForCall = append(fake.sendBytesPerSecondArgsForCall, struct {
+		arg1 string
+		arg2 float64
+	}{arg1, arg2})
+	fake.recordInvocation("SendBytesPerSecond", []interface{}{arg1, arg2})
+	fake.sendBytesPerSecondMutex.Unlock()
+	if fake.SendBytesPerSecondStub != nil {
+		return fake.SendBytesPerSecondStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.sendComponentMetricReturns.result1
+	fakeReturns := fake.sendBytesPerSecondReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeIngressClient) SendBytesPerSecondCallCount() int {
+	fake.sendBytesPerSecondMutex.RLock()
+	defer fake.sendBytesPerSecondMutex.RUnlock()
+	return len(fake.sendBytesPerSecondArgsForCall)
+}
+
+func (fake *FakeIngressClient) SendBytesPerSecondCalls(stub func(string, float64) error) {
+	fake.sendBytesPerSecondMutex.Lock()
+	defer fake.sendBytesPerSecondMutex.Unlock()
+	fake.SendBytesPerSecondStub = stub
+}
+
+func (fake *FakeIngressClient) SendBytesPerSecondArgsForCall(i int) (string, float64) {
+	fake.sendBytesPerSecondMutex.RLock()
+	defer fake.sendBytesPerSecondMutex.RUnlock()
+	argsForCall := fake.sendBytesPerSecondArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeIngressClient) SendBytesPerSecondReturns(result1 error) {
+	fake.sendBytesPerSecondMutex.Lock()
+	defer fake.sendBytesPerSecondMutex.Unlock()
+	fake.SendBytesPerSecondStub = nil
+	fake.sendBytesPerSecondReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIngressClient) SendBytesPerSecondReturnsOnCall(i int, result1 error) {
+	fake.sendBytesPerSecondMutex.Lock()
+	defer fake.sendBytesPerSecondMutex.Unlock()
+	fake.SendBytesPerSecondStub = nil
+	if fake.sendBytesPerSecondReturnsOnCall == nil {
+		fake.sendBytesPerSecondReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.sendBytesPerSecondReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIngressClient) SendComponentMetric(arg1 string, arg2 float64, arg3 string) error {
+	fake.sendComponentMetricMutex.Lock()
+	ret, specificReturn := fake.sendComponentMetricReturnsOnCall[len(fake.sendComponentMetricArgsForCall)]
+	fake.sendComponentMetricArgsForCall = append(fake.sendComponentMetricArgsForCall, struct {
+		arg1 string
+		arg2 float64
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("SendComponentMetric", []interface{}{arg1, arg2, arg3})
+	fake.sendComponentMetricMutex.Unlock()
+	if fake.SendComponentMetricStub != nil {
+		return fake.SendComponentMetricStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.sendComponentMetricReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeIngressClient) SendComponentMetricCallCount() int {
@@ -670,13 +541,22 @@ func (fake *FakeIngressClient) SendComponentMetricCallCount() int {
 	return len(fake.sendComponentMetricArgsForCall)
 }
 
+func (fake *FakeIngressClient) SendComponentMetricCalls(stub func(string, float64, string) error) {
+	fake.sendComponentMetricMutex.Lock()
+	defer fake.sendComponentMetricMutex.Unlock()
+	fake.SendComponentMetricStub = stub
+}
+
 func (fake *FakeIngressClient) SendComponentMetricArgsForCall(i int) (string, float64, string) {
 	fake.sendComponentMetricMutex.RLock()
 	defer fake.sendComponentMetricMutex.RUnlock()
-	return fake.sendComponentMetricArgsForCall[i].name, fake.sendComponentMetricArgsForCall[i].value, fake.sendComponentMetricArgsForCall[i].unit
+	argsForCall := fake.sendComponentMetricArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeIngressClient) SendComponentMetricReturns(result1 error) {
+	fake.sendComponentMetricMutex.Lock()
+	defer fake.sendComponentMetricMutex.Unlock()
 	fake.SendComponentMetricStub = nil
 	fake.sendComponentMetricReturns = struct {
 		result1 error
@@ -684,6 +564,8 @@ func (fake *FakeIngressClient) SendComponentMetricReturns(result1 error) {
 }
 
 func (fake *FakeIngressClient) SendComponentMetricReturnsOnCall(i int, result1 error) {
+	fake.sendComponentMetricMutex.Lock()
+	defer fake.sendComponentMetricMutex.Unlock()
 	fake.SendComponentMetricStub = nil
 	if fake.sendComponentMetricReturnsOnCall == nil {
 		fake.sendComponentMetricReturnsOnCall = make(map[int]struct {
@@ -695,31 +577,277 @@ func (fake *FakeIngressClient) SendComponentMetricReturnsOnCall(i int, result1 e
 	}{result1}
 }
 
+func (fake *FakeIngressClient) SendDuration(arg1 string, arg2 time.Duration, arg3 ...loggregator.EmitGaugeOption) error {
+	fake.sendDurationMutex.Lock()
+	ret, specificReturn := fake.sendDurationReturnsOnCall[len(fake.sendDurationArgsForCall)]
+	fake.sendDurationArgsForCall = append(fake.sendDurationArgsForCall, struct {
+		arg1 string
+		arg2 time.Duration
+		arg3 []loggregator.EmitGaugeOption
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("SendDuration", []interface{}{arg1, arg2, arg3})
+	fake.sendDurationMutex.Unlock()
+	if fake.SendDurationStub != nil {
+		return fake.SendDurationStub(arg1, arg2, arg3...)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.sendDurationReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeIngressClient) SendDurationCallCount() int {
+	fake.sendDurationMutex.RLock()
+	defer fake.sendDurationMutex.RUnlock()
+	return len(fake.sendDurationArgsForCall)
+}
+
+func (fake *FakeIngressClient) SendDurationCalls(stub func(string, time.Duration, ...loggregator.EmitGaugeOption) error) {
+	fake.sendDurationMutex.Lock()
+	defer fake.sendDurationMutex.Unlock()
+	fake.SendDurationStub = stub
+}
+
+func (fake *FakeIngressClient) SendDurationArgsForCall(i int) (string, time.Duration, []loggregator.EmitGaugeOption) {
+	fake.sendDurationMutex.RLock()
+	defer fake.sendDurationMutex.RUnlock()
+	argsForCall := fake.sendDurationArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeIngressClient) SendDurationReturns(result1 error) {
+	fake.sendDurationMutex.Lock()
+	defer fake.sendDurationMutex.Unlock()
+	fake.SendDurationStub = nil
+	fake.sendDurationReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIngressClient) SendDurationReturnsOnCall(i int, result1 error) {
+	fake.sendDurationMutex.Lock()
+	defer fake.sendDurationMutex.Unlock()
+	fake.SendDurationStub = nil
+	if fake.sendDurationReturnsOnCall == nil {
+		fake.sendDurationReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.sendDurationReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIngressClient) SendMebiBytes(arg1 string, arg2 int) error {
+	fake.sendMebiBytesMutex.Lock()
+	ret, specificReturn := fake.sendMebiBytesReturnsOnCall[len(fake.sendMebiBytesArgsForCall)]
+	fake.sendMebiBytesArgsForCall = append(fake.sendMebiBytesArgsForCall, struct {
+		arg1 string
+		arg2 int
+	}{arg1, arg2})
+	fake.recordInvocation("SendMebiBytes", []interface{}{arg1, arg2})
+	fake.sendMebiBytesMutex.Unlock()
+	if fake.SendMebiBytesStub != nil {
+		return fake.SendMebiBytesStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.sendMebiBytesReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeIngressClient) SendMebiBytesCallCount() int {
+	fake.sendMebiBytesMutex.RLock()
+	defer fake.sendMebiBytesMutex.RUnlock()
+	return len(fake.sendMebiBytesArgsForCall)
+}
+
+func (fake *FakeIngressClient) SendMebiBytesCalls(stub func(string, int) error) {
+	fake.sendMebiBytesMutex.Lock()
+	defer fake.sendMebiBytesMutex.Unlock()
+	fake.SendMebiBytesStub = stub
+}
+
+func (fake *FakeIngressClient) SendMebiBytesArgsForCall(i int) (string, int) {
+	fake.sendMebiBytesMutex.RLock()
+	defer fake.sendMebiBytesMutex.RUnlock()
+	argsForCall := fake.sendMebiBytesArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeIngressClient) SendMebiBytesReturns(result1 error) {
+	fake.sendMebiBytesMutex.Lock()
+	defer fake.sendMebiBytesMutex.Unlock()
+	fake.SendMebiBytesStub = nil
+	fake.sendMebiBytesReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIngressClient) SendMebiBytesReturnsOnCall(i int, result1 error) {
+	fake.sendMebiBytesMutex.Lock()
+	defer fake.sendMebiBytesMutex.Unlock()
+	fake.SendMebiBytesStub = nil
+	if fake.sendMebiBytesReturnsOnCall == nil {
+		fake.sendMebiBytesReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.sendMebiBytesReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIngressClient) SendMetric(arg1 string, arg2 int, arg3 ...loggregator.EmitGaugeOption) error {
+	fake.sendMetricMutex.Lock()
+	ret, specificReturn := fake.sendMetricReturnsOnCall[len(fake.sendMetricArgsForCall)]
+	fake.sendMetricArgsForCall = append(fake.sendMetricArgsForCall, struct {
+		arg1 string
+		arg2 int
+		arg3 []loggregator.EmitGaugeOption
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("SendMetric", []interface{}{arg1, arg2, arg3})
+	fake.sendMetricMutex.Unlock()
+	if fake.SendMetricStub != nil {
+		return fake.SendMetricStub(arg1, arg2, arg3...)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.sendMetricReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeIngressClient) SendMetricCallCount() int {
+	fake.sendMetricMutex.RLock()
+	defer fake.sendMetricMutex.RUnlock()
+	return len(fake.sendMetricArgsForCall)
+}
+
+func (fake *FakeIngressClient) SendMetricCalls(stub func(string, int, ...loggregator.EmitGaugeOption) error) {
+	fake.sendMetricMutex.Lock()
+	defer fake.sendMetricMutex.Unlock()
+	fake.SendMetricStub = stub
+}
+
+func (fake *FakeIngressClient) SendMetricArgsForCall(i int) (string, int, []loggregator.EmitGaugeOption) {
+	fake.sendMetricMutex.RLock()
+	defer fake.sendMetricMutex.RUnlock()
+	argsForCall := fake.sendMetricArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeIngressClient) SendMetricReturns(result1 error) {
+	fake.sendMetricMutex.Lock()
+	defer fake.sendMetricMutex.Unlock()
+	fake.SendMetricStub = nil
+	fake.sendMetricReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIngressClient) SendMetricReturnsOnCall(i int, result1 error) {
+	fake.sendMetricMutex.Lock()
+	defer fake.sendMetricMutex.Unlock()
+	fake.SendMetricStub = nil
+	if fake.sendMetricReturnsOnCall == nil {
+		fake.sendMetricReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.sendMetricReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIngressClient) SendRequestsPerSecond(arg1 string, arg2 float64) error {
+	fake.sendRequestsPerSecondMutex.Lock()
+	ret, specificReturn := fake.sendRequestsPerSecondReturnsOnCall[len(fake.sendRequestsPerSecondArgsForCall)]
+	fake.sendRequestsPerSecondArgsForCall = append(fake.sendRequestsPerSecondArgsForCall, struct {
+		arg1 string
+		arg2 float64
+	}{arg1, arg2})
+	fake.recordInvocation("SendRequestsPerSecond", []interface{}{arg1, arg2})
+	fake.sendRequestsPerSecondMutex.Unlock()
+	if fake.SendRequestsPerSecondStub != nil {
+		return fake.SendRequestsPerSecondStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.sendRequestsPerSecondReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeIngressClient) SendRequestsPerSecondCallCount() int {
+	fake.sendRequestsPerSecondMutex.RLock()
+	defer fake.sendRequestsPerSecondMutex.RUnlock()
+	return len(fake.sendRequestsPerSecondArgsForCall)
+}
+
+func (fake *FakeIngressClient) SendRequestsPerSecondCalls(stub func(string, float64) error) {
+	fake.sendRequestsPerSecondMutex.Lock()
+	defer fake.sendRequestsPerSecondMutex.Unlock()
+	fake.SendRequestsPerSecondStub = stub
+}
+
+func (fake *FakeIngressClient) SendRequestsPerSecondArgsForCall(i int) (string, float64) {
+	fake.sendRequestsPerSecondMutex.RLock()
+	defer fake.sendRequestsPerSecondMutex.RUnlock()
+	argsForCall := fake.sendRequestsPerSecondArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeIngressClient) SendRequestsPerSecondReturns(result1 error) {
+	fake.sendRequestsPerSecondMutex.Lock()
+	defer fake.sendRequestsPerSecondMutex.Unlock()
+	fake.SendRequestsPerSecondStub = nil
+	fake.sendRequestsPerSecondReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIngressClient) SendRequestsPerSecondReturnsOnCall(i int, result1 error) {
+	fake.sendRequestsPerSecondMutex.Lock()
+	defer fake.sendRequestsPerSecondMutex.Unlock()
+	fake.SendRequestsPerSecondStub = nil
+	if fake.sendRequestsPerSecondReturnsOnCall == nil {
+		fake.sendRequestsPerSecondReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.sendRequestsPerSecondReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeIngressClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.incrementCounterMutex.RLock()
+	defer fake.incrementCounterMutex.RUnlock()
+	fake.incrementCounterWithDeltaMutex.RLock()
+	defer fake.incrementCounterWithDeltaMutex.RUnlock()
+	fake.sendAppErrorLogMutex.RLock()
+	defer fake.sendAppErrorLogMutex.RUnlock()
+	fake.sendAppLogMutex.RLock()
+	defer fake.sendAppLogMutex.RUnlock()
+	fake.sendAppMetricsMutex.RLock()
+	defer fake.sendAppMetricsMutex.RUnlock()
+	fake.sendBytesPerSecondMutex.RLock()
+	defer fake.sendBytesPerSecondMutex.RUnlock()
+	fake.sendComponentMetricMutex.RLock()
+	defer fake.sendComponentMetricMutex.RUnlock()
 	fake.sendDurationMutex.RLock()
 	defer fake.sendDurationMutex.RUnlock()
 	fake.sendMebiBytesMutex.RLock()
 	defer fake.sendMebiBytesMutex.RUnlock()
 	fake.sendMetricMutex.RLock()
 	defer fake.sendMetricMutex.RUnlock()
-	fake.sendBytesPerSecondMutex.RLock()
-	defer fake.sendBytesPerSecondMutex.RUnlock()
 	fake.sendRequestsPerSecondMutex.RLock()
 	defer fake.sendRequestsPerSecondMutex.RUnlock()
-	fake.incrementCounterMutex.RLock()
-	defer fake.incrementCounterMutex.RUnlock()
-	fake.incrementCounterWithDeltaMutex.RLock()
-	defer fake.incrementCounterWithDeltaMutex.RUnlock()
-	fake.sendAppLogMutex.RLock()
-	defer fake.sendAppLogMutex.RUnlock()
-	fake.sendAppErrorLogMutex.RLock()
-	defer fake.sendAppErrorLogMutex.RUnlock()
-	fake.sendAppMetricsMutex.RLock()
-	defer fake.sendAppMetricsMutex.RUnlock()
-	fake.sendComponentMetricMutex.RLock()
-	defer fake.sendComponentMetricMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

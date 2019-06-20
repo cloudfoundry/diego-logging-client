@@ -29,10 +29,10 @@ func (*noopIngressClient) IncrementCounter(name string) error {
 func (*noopIngressClient) IncrementCounterWithDelta(name string, value uint64) error {
 	return nil
 }
-func (*noopIngressClient) SendAppLog(appID, message, sourceType, sourceInstance string) error {
+func (*noopIngressClient) SendAppLog(message, sourceType string, tags map[string]string) error {
 	return nil
 }
-func (*noopIngressClient) SendAppErrorLog(appID, message, sourceType, sourceInstance string) error {
+func (*noopIngressClient) SendAppErrorLog(message, sourceType string, tags map[string]string) error {
 	return nil
 }
 func (*noopIngressClient) SendAppMetrics(metrics ContainerMetric) error {
