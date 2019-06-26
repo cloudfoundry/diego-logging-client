@@ -46,7 +46,7 @@ type ContainerMetric struct {
 //go:generate counterfeiter -o testhelpers/fake_ingress_client.go . IngressClient
 type IngressClient interface {
 	SendDuration(name string, value time.Duration, opts ...loggregator.EmitGaugeOption) error
-	SendMebiBytes(name string, value int) error
+	SendMebiBytes(name string, value int, opts ...loggregator.EmitGaugeOption) error
 	SendMetric(name string, value int, opts ...loggregator.EmitGaugeOption) error
 	SendBytesPerSecond(name string, value float64) error
 	SendRequestsPerSecond(name string, value float64) error
@@ -132,11 +132,12 @@ func (c client) SendDuration(name string, value time.Duration, opts ...loggregat
 	return nil
 }
 
-func (c client) SendMebiBytes(name string, value int) error {
-	c.client.EmitGauge(
+func (c client) SendMebiBytes(name string, value int, opts ...loggregator.EmitGaugeOption) error {
+	opts = append([]loggregator.EmitGaugeOption{
 		loggregator.WithGaugeSourceInfo(c.sourceID, c.instanceID),
 		loggregator.WithGaugeValue(name, float64(value), "MiB"),
-	)
+	}, opts...)
+	c.client.EmitGauge(opts...)
 	return nil
 }
 

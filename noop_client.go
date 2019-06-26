@@ -11,7 +11,7 @@ type noopIngressClient struct{}
 func (*noopIngressClient) SendDuration(name string, value time.Duration, opts ...loggregator.EmitGaugeOption) error {
 	return nil
 }
-func (*noopIngressClient) SendMebiBytes(name string, value int) error {
+func (*noopIngressClient) SendMebiBytes(name string, value int, opts ...loggregator.EmitGaugeOption) error {
 	return nil
 }
 func (*noopIngressClient) SendMetric(name string, value int, opts ...loggregator.EmitGaugeOption) error {

@@ -108,11 +108,12 @@ type FakeIngressClient struct {
 	sendDurationReturnsOnCall map[int]struct {
 		result1 error
 	}
-	SendMebiBytesStub        func(string, int) error
+	SendMebiBytesStub        func(string, int, ...loggregator.EmitGaugeOption) error
 	sendMebiBytesMutex       sync.RWMutex
 	sendMebiBytesArgsForCall []struct {
 		arg1 string
 		arg2 int
+		arg3 []loggregator.EmitGaugeOption
 	}
 	sendMebiBytesReturns struct {
 		result1 error
@@ -639,17 +640,18 @@ func (fake *FakeIngressClient) SendDurationReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeIngressClient) SendMebiBytes(arg1 string, arg2 int) error {
+func (fake *FakeIngressClient) SendMebiBytes(arg1 string, arg2 int, arg3 ...loggregator.EmitGaugeOption) error {
 	fake.sendMebiBytesMutex.Lock()
 	ret, specificReturn := fake.sendMebiBytesReturnsOnCall[len(fake.sendMebiBytesArgsForCall)]
 	fake.sendMebiBytesArgsForCall = append(fake.sendMebiBytesArgsForCall, struct {
 		arg1 string
 		arg2 int
-	}{arg1, arg2})
-	fake.recordInvocation("SendMebiBytes", []interface{}{arg1, arg2})
+		arg3 []loggregator.EmitGaugeOption
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("SendMebiBytes", []interface{}{arg1, arg2, arg3})
 	fake.sendMebiBytesMutex.Unlock()
 	if fake.SendMebiBytesStub != nil {
-		return fake.SendMebiBytesStub(arg1, arg2)
+		return fake.SendMebiBytesStub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1
@@ -664,17 +666,17 @@ func (fake *FakeIngressClient) SendMebiBytesCallCount() int {
 	return len(fake.sendMebiBytesArgsForCall)
 }
 
-func (fake *FakeIngressClient) SendMebiBytesCalls(stub func(string, int) error) {
+func (fake *FakeIngressClient) SendMebiBytesCalls(stub func(string, int, ...loggregator.EmitGaugeOption) error) {
 	fake.sendMebiBytesMutex.Lock()
 	defer fake.sendMebiBytesMutex.Unlock()
 	fake.SendMebiBytesStub = stub
 }
 
-func (fake *FakeIngressClient) SendMebiBytesArgsForCall(i int) (string, int) {
+func (fake *FakeIngressClient) SendMebiBytesArgsForCall(i int) (string, int, []loggregator.EmitGaugeOption) {
 	fake.sendMebiBytesMutex.RLock()
 	defer fake.sendMebiBytesMutex.RUnlock()
 	argsForCall := fake.sendMebiBytesArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeIngressClient) SendMebiBytesReturns(result1 error) {
