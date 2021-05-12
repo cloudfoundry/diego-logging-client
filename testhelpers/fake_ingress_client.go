@@ -167,15 +167,16 @@ func (fake *FakeIngressClient) IncrementCounter(arg1 string) error {
 	fake.incrementCounterArgsForCall = append(fake.incrementCounterArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.IncrementCounterStub
+	fakeReturns := fake.incrementCounterReturns
 	fake.recordInvocation("IncrementCounter", []interface{}{arg1})
 	fake.incrementCounterMutex.Unlock()
-	if fake.IncrementCounterStub != nil {
-		return fake.IncrementCounterStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.incrementCounterReturns
 	return fakeReturns.result1
 }
 
@@ -228,15 +229,16 @@ func (fake *FakeIngressClient) IncrementCounterWithDelta(arg1 string, arg2 uint6
 		arg1 string
 		arg2 uint64
 	}{arg1, arg2})
+	stub := fake.IncrementCounterWithDeltaStub
+	fakeReturns := fake.incrementCounterWithDeltaReturns
 	fake.recordInvocation("IncrementCounterWithDelta", []interface{}{arg1, arg2})
 	fake.incrementCounterWithDeltaMutex.Unlock()
-	if fake.IncrementCounterWithDeltaStub != nil {
-		return fake.IncrementCounterWithDeltaStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.incrementCounterWithDeltaReturns
 	return fakeReturns.result1
 }
 
@@ -290,15 +292,16 @@ func (fake *FakeIngressClient) SendAppErrorLog(arg1 string, arg2 string, arg3 ma
 		arg2 string
 		arg3 map[string]string
 	}{arg1, arg2, arg3})
+	stub := fake.SendAppErrorLogStub
+	fakeReturns := fake.sendAppErrorLogReturns
 	fake.recordInvocation("SendAppErrorLog", []interface{}{arg1, arg2, arg3})
 	fake.sendAppErrorLogMutex.Unlock()
-	if fake.SendAppErrorLogStub != nil {
-		return fake.SendAppErrorLogStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.sendAppErrorLogReturns
 	return fakeReturns.result1
 }
 
@@ -352,15 +355,16 @@ func (fake *FakeIngressClient) SendAppLog(arg1 string, arg2 string, arg3 map[str
 		arg2 string
 		arg3 map[string]string
 	}{arg1, arg2, arg3})
+	stub := fake.SendAppLogStub
+	fakeReturns := fake.sendAppLogReturns
 	fake.recordInvocation("SendAppLog", []interface{}{arg1, arg2, arg3})
 	fake.sendAppLogMutex.Unlock()
-	if fake.SendAppLogStub != nil {
-		return fake.SendAppLogStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.sendAppLogReturns
 	return fakeReturns.result1
 }
 
@@ -412,15 +416,16 @@ func (fake *FakeIngressClient) SendAppMetrics(arg1 diego_logging_client.Containe
 	fake.sendAppMetricsArgsForCall = append(fake.sendAppMetricsArgsForCall, struct {
 		arg1 diego_logging_client.ContainerMetric
 	}{arg1})
+	stub := fake.SendAppMetricsStub
+	fakeReturns := fake.sendAppMetricsReturns
 	fake.recordInvocation("SendAppMetrics", []interface{}{arg1})
 	fake.sendAppMetricsMutex.Unlock()
-	if fake.SendAppMetricsStub != nil {
-		return fake.SendAppMetricsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.sendAppMetricsReturns
 	return fakeReturns.result1
 }
 
@@ -473,15 +478,16 @@ func (fake *FakeIngressClient) SendBytesPerSecond(arg1 string, arg2 float64) err
 		arg1 string
 		arg2 float64
 	}{arg1, arg2})
+	stub := fake.SendBytesPerSecondStub
+	fakeReturns := fake.sendBytesPerSecondReturns
 	fake.recordInvocation("SendBytesPerSecond", []interface{}{arg1, arg2})
 	fake.sendBytesPerSecondMutex.Unlock()
-	if fake.SendBytesPerSecondStub != nil {
-		return fake.SendBytesPerSecondStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.sendBytesPerSecondReturns
 	return fakeReturns.result1
 }
 
@@ -535,15 +541,16 @@ func (fake *FakeIngressClient) SendComponentMetric(arg1 string, arg2 float64, ar
 		arg2 float64
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.SendComponentMetricStub
+	fakeReturns := fake.sendComponentMetricReturns
 	fake.recordInvocation("SendComponentMetric", []interface{}{arg1, arg2, arg3})
 	fake.sendComponentMetricMutex.Unlock()
-	if fake.SendComponentMetricStub != nil {
-		return fake.SendComponentMetricStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.sendComponentMetricReturns
 	return fakeReturns.result1
 }
 
@@ -597,15 +604,16 @@ func (fake *FakeIngressClient) SendDuration(arg1 string, arg2 time.Duration, arg
 		arg2 time.Duration
 		arg3 []loggregator.EmitGaugeOption
 	}{arg1, arg2, arg3})
+	stub := fake.SendDurationStub
+	fakeReturns := fake.sendDurationReturns
 	fake.recordInvocation("SendDuration", []interface{}{arg1, arg2, arg3})
 	fake.sendDurationMutex.Unlock()
-	if fake.SendDurationStub != nil {
-		return fake.SendDurationStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.sendDurationReturns
 	return fakeReturns.result1
 }
 
@@ -659,15 +667,16 @@ func (fake *FakeIngressClient) SendMebiBytes(arg1 string, arg2 int, arg3 ...logg
 		arg2 int
 		arg3 []loggregator.EmitGaugeOption
 	}{arg1, arg2, arg3})
+	stub := fake.SendMebiBytesStub
+	fakeReturns := fake.sendMebiBytesReturns
 	fake.recordInvocation("SendMebiBytes", []interface{}{arg1, arg2, arg3})
 	fake.sendMebiBytesMutex.Unlock()
-	if fake.SendMebiBytesStub != nil {
-		return fake.SendMebiBytesStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.sendMebiBytesReturns
 	return fakeReturns.result1
 }
 
@@ -721,15 +730,16 @@ func (fake *FakeIngressClient) SendMetric(arg1 string, arg2 int, arg3 ...loggreg
 		arg2 int
 		arg3 []loggregator.EmitGaugeOption
 	}{arg1, arg2, arg3})
+	stub := fake.SendMetricStub
+	fakeReturns := fake.sendMetricReturns
 	fake.recordInvocation("SendMetric", []interface{}{arg1, arg2, arg3})
 	fake.sendMetricMutex.Unlock()
-	if fake.SendMetricStub != nil {
-		return fake.SendMetricStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.sendMetricReturns
 	return fakeReturns.result1
 }
 
@@ -782,15 +792,16 @@ func (fake *FakeIngressClient) SendRequestsPerSecond(arg1 string, arg2 float64) 
 		arg1 string
 		arg2 float64
 	}{arg1, arg2})
+	stub := fake.SendRequestsPerSecondStub
+	fakeReturns := fake.sendRequestsPerSecondReturns
 	fake.recordInvocation("SendRequestsPerSecond", []interface{}{arg1, arg2})
 	fake.sendRequestsPerSecondMutex.Unlock()
-	if fake.SendRequestsPerSecondStub != nil {
-		return fake.SendRequestsPerSecondStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.sendRequestsPerSecondReturns
 	return fakeReturns.result1
 }
 
@@ -842,15 +853,16 @@ func (fake *FakeIngressClient) SendSpikeMetrics(arg1 diego_logging_client.SpikeM
 	fake.sendSpikeMetricsArgsForCall = append(fake.sendSpikeMetricsArgsForCall, struct {
 		arg1 diego_logging_client.SpikeMetric
 	}{arg1})
+	stub := fake.SendSpikeMetricsStub
+	fakeReturns := fake.sendSpikeMetricsReturns
 	fake.recordInvocation("SendSpikeMetrics", []interface{}{arg1})
 	fake.sendSpikeMetricsMutex.Unlock()
-	if fake.SendSpikeMetricsStub != nil {
-		return fake.SendSpikeMetricsStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.sendSpikeMetricsReturns
 	return fakeReturns.result1
 }
 
