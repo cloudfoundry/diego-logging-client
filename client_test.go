@@ -3,6 +3,7 @@ package diego_logging_client_test
 import (
 	"os"
 	"path"
+	"path/filepath"
 	"time"
 
 	client "code.cloudfoundry.org/diego-logging-client"
@@ -24,7 +25,23 @@ var (
 var _ = Describe("DiegoLoggingClient", func() {
 	var (
 		c client.IngressClient
+		fixturesPath,
+		metronCAFile,
+		metronServerCertFile,
+		metronServerKeyFile,
+		metronClientCertFile,
+		metronClientKeyFile string
 	)
+	BeforeEach(func() {
+		wd, err := os.Getwd()
+		Expect(err).To(Succeed())
+		fixturesPath = filepath.Join(wd, "fixtures")
+		metronCAFile = filepath.Join(fixturesPath, "metron", "CA.crt")
+		metronServerCertFile = filepath.Join(fixturesPath, "metron", "metron.crt")
+		metronServerKeyFile = filepath.Join(fixturesPath, "metron", "metron.key")
+		metronClientCertFile = filepath.Join(fixturesPath, "metron", "client.crt")
+		metronClientKeyFile = filepath.Join(fixturesPath, "metron", "client.key")
+	})
 
 	Context("when the v2 api is used", func() {
 		var (
