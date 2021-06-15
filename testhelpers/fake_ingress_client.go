@@ -6,7 +6,7 @@ import (
 	"time"
 
 	diego_logging_client "code.cloudfoundry.org/diego-logging-client"
-	loggregator "code.cloudfoundry.org/go-loggregator"
+	loggregator "code.cloudfoundry.org/go-loggregator/v8"
 )
 
 type FakeIngressClient struct {
