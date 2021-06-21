@@ -1,12 +1,11 @@
 # code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee
 ## explicit
 code.cloudfoundry.org/go-diodes
-# code.cloudfoundry.org/go-loggregator/v8 v8.0.3
+# code.cloudfoundry.org/go-loggregator/v8 v8.0.5
 ## explicit
 code.cloudfoundry.org/go-loggregator/v8
+code.cloudfoundry.org/go-loggregator/v8/rfc5424
 code.cloudfoundry.org/go-loggregator/v8/rpc/loggregator_v2
-# code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a
-code.cloudfoundry.org/rfc5424
 # code.cloudfoundry.org/tlsconfig v0.0.0-20200131000646-bbe0f8da39b3
 code.cloudfoundry.org/tlsconfig
 # github.com/fsnotify/fsnotify v1.4.9
