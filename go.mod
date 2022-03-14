@@ -8,5 +8,5 @@ require (
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.18.1
 	golang.org/x/net v0.0.0-20210610132358-84b48f89b13b
-	google.golang.org/grpc v1.44.0
+	google.golang.org/grpc v1.45.0
 )
