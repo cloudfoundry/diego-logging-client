@@ -343,6 +343,45 @@ var _ = Describe("DiegoLoggingClient", func() {
 				})
 			})
 
+			Describe("SendAppLogRate", func() {
+				var batch *loggregator_v2.EnvelopeBatch
+
+				JustBeforeEach(func() {
+					tags := map[string]string{
+						"source_id":   "some-source-id",
+						"instance_id": "345",
+						"some-key":    "some-value",
+					}
+					Expect(c.SendAppLogRate(50, 100, tags)).To(Succeed())
+					batch = getEnvelopeBatch()
+				})
+
+				It("sets app info", func() {
+					Expect(batch.Batch).To(HaveLen(1))
+					Expect(batch.Batch[0].GetSourceId()).To(Equal("some-source-id"))
+					Expect(batch.Batch[0].GetInstanceId()).To(Equal("345"))
+				})
+
+				It("sends log rate and log rate limit", func() {
+					metrics := batch.Batch[0].GetGauge().GetMetrics()
+					Expect(metrics["log_rate"].GetValue()).To(Equal(float64(50)))
+					Expect(metrics["log_rate"].GetUnit()).To(Equal("B/s"))
+
+					Expect(metrics["log_rate_limit"].GetValue()).To(Equal(float64(100)))
+					Expect(metrics["log_rate_limit"].GetUnit()).To(Equal("B/s"))
+				})
+
+				It("sends tags", func() {
+					Expect(batch.Batch).To(HaveLen(1))
+					Expect(batch.Batch[0].GetTags()).To(Equal(map[string]string{
+						"origin":      "some-origin",
+						"source_id":   "some-source-id",
+						"instance_id": "345",
+						"some-key":    "some-value",
+					}))
+				})
+			})
+
 			Describe("SendSpikeMetrics", func() {
 				var batch *loggregator_v2.EnvelopeBatch
 
