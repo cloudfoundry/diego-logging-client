@@ -6,7 +6,7 @@ require (
 	code.cloudfoundry.org/go-loggregator/v8 v8.0.5
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.26.0
-	golang.org/x/net v0.6.0
+	golang.org/x/net v0.7.0
 	google.golang.org/grpc v1.53.0
 )
 
