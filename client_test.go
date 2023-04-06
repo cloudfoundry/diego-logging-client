@@ -9,7 +9,7 @@ import (
 	client "code.cloudfoundry.org/diego-logging-client"
 	"code.cloudfoundry.org/diego-logging-client/testhelpers"
 	"code.cloudfoundry.org/go-loggregator/v8/rpc/loggregator_v2"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -407,12 +407,9 @@ var _ = Describe("DiegoLoggingClient", func() {
 				})
 
 				It("sends start and end times", func() {
-					metrics := batch.Batch[0].GetGauge().GetMetrics()
-					Expect(metrics["spike_start"].GetValue()).To(Equal(float64(123)))
-					Expect(metrics["spike_start"].GetUnit()).To(Equal("seconds"))
-
-					Expect(metrics["spike_end"].GetValue()).To(Equal(float64(234)))
-					Expect(metrics["spike_end"].GetUnit()).To(Equal("seconds"))
+					metrics := batch.Batch[0].GetTimer()
+					Expect(metrics.Start).To(Equal(int64(123000000000)))
+					Expect(metrics.Stop).To(Equal(int64(234000000000)))
 				})
 
 				It("sends tags", func() {
