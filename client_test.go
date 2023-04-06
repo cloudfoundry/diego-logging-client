@@ -106,6 +106,10 @@ var _ = Describe("DiegoLoggingClient", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 
+			assertEnvelopeBatchNotSent := func()  {
+				Consistently(testIngressServer.Receivers()).ShouldNot(Receive(&sender))
+			}
+ 
 			getEnvelopeBatch := func() *loggregator_v2.EnvelopeBatch {
 				if sender == nil {
 					Eventually(testIngressServer.Receivers()).Should(Receive(&sender))
@@ -174,6 +178,11 @@ var _ = Describe("DiegoLoggingClient", func() {
 					Expect(c.IncrementCounterWithDelta("its", 5)).To(Succeed())
 
 					assertEnvelopeSourceAndInstanceIDAreCorrect(getEnvelopeBatch())
+				})
+				It("does not emit metric if delta = 0", func() {
+					Expect(c.IncrementCounterWithDelta("its", 0)).To(Succeed())
+
+					assertEnvelopeBatchNotSent();
 				})
 			})
 
