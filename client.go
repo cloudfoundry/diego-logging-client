@@ -187,6 +187,9 @@ func (c client) IncrementCounter(name string) error {
 }
 
 func (c client) IncrementCounterWithDelta(name string, value uint64) error {
+	if value == 0 {
+		return nil;
+	}
 	c.client.EmitCounter(
 		name,
 		loggregator.WithCounterSourceInfo(c.sourceID, c.instanceID),
