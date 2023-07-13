@@ -282,6 +282,10 @@ var _ = Describe("DiegoLoggingClient", func() {
 						AbsoluteCPUUsage:       1,
 						AbsoluteCPUEntitlement: 2,
 						ContainerAge:           3,
+
+						RxBytes: 42,
+						TxBytes: 43,
+
 						Tags: map[string]string{
 							"source_id":   "some-source-id",
 							"instance_id": "345",
@@ -330,6 +334,15 @@ var _ = Describe("DiegoLoggingClient", func() {
 
 					Expect(metrics["container_age"].GetValue()).To(Equal(float64(3)))
 					Expect(metrics["container_age"].GetUnit()).To(Equal("nanoseconds"))
+				})
+
+				It("sends network traffic usage", func() {
+					metrics := batch.Batch[0].GetGauge().GetMetrics()
+					Expect(metrics["rx_bytes"].GetValue()).To(Equal(float64(42)))
+					Expect(metrics["rx_bytes"].GetUnit()).To(Equal("bytes"))
+
+					Expect(metrics["tx_bytes"].GetValue()).To(Equal(float64(43)))
+					Expect(metrics["tx_bytes"].GetUnit()).To(Equal("bytes"))
 				})
 
 				It("sends tags", func() {
