@@ -39,6 +39,8 @@ type ContainerMetric struct {
 	AbsoluteCPUUsage       uint64
 	AbsoluteCPUEntitlement uint64
 	ContainerAge           uint64
+	RxBytes                uint64
+	TxBytes                uint64
 	Tags                   map[string]string
 }
 
@@ -223,6 +225,8 @@ func (c client) SendAppMetrics(m ContainerMetric) error {
 		loggregator.WithGaugeValue("disk", float64(m.DiskBytes), "bytes"),
 		loggregator.WithGaugeValue("memory_quota", float64(m.MemoryBytesQuota), "bytes"),
 		loggregator.WithGaugeValue("disk_quota", float64(m.DiskBytesQuota), "bytes"),
+		loggregator.WithGaugeValue("rx_bytes", float64(m.RxBytes), "bytes"),
+		loggregator.WithGaugeValue("tx_bytes", float64(m.TxBytes), "bytes"),
 		loggregator.WithEnvelopeTags(m.Tags),
 	)
 
