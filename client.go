@@ -39,8 +39,8 @@ type ContainerMetric struct {
 	AbsoluteCPUUsage       uint64
 	AbsoluteCPUEntitlement uint64
 	ContainerAge           uint64
-	RxBytes                uint64
-	TxBytes                uint64
+	RxBytes                *uint64
+	TxBytes                *uint64
 	Tags                   map[string]string
 }
 
@@ -225,14 +225,12 @@ func (c client) SendAppMetrics(m ContainerMetric) error {
 		loggregator.WithGaugeValue("disk", float64(m.DiskBytes), "bytes"),
 		loggregator.WithGaugeValue("memory_quota", float64(m.MemoryBytesQuota), "bytes"),
 		loggregator.WithGaugeValue("disk_quota", float64(m.DiskBytesQuota), "bytes"),
-		loggregator.WithGaugeValue("rx_bytes", float64(m.RxBytes), "bytes"),
-		loggregator.WithGaugeValue("tx_bytes", float64(m.TxBytes), "bytes"),
 		loggregator.WithEnvelopeTags(m.Tags),
 	)
 
-	// Emit the new metrics in a separate envelope.  Loggregator will convert a
+	// Emit the new metrics in a separate envelope. Loggregator will convert a
 	// gauge envelope with cpu, memory, disk, etc. to a container metric
-	// envelope and ignore the rest of the fields.  Emitting absolute_usage,
+	// envelope and ignore the rest of the fields. Emitting absolute_usage,
 	// absolute_entitlement & container_age in a separate envelope allows v1
 	// subscribers (cf nozzle) to be able to see those fields.  Note,
 	// Loggregator will emit each value in a separate envelope for v1
@@ -244,6 +242,14 @@ func (c client) SendAppMetrics(m ContainerMetric) error {
 		loggregator.WithGaugeValue("container_age", float64(m.ContainerAge), "nanoseconds"),
 		loggregator.WithEnvelopeTags(m.Tags),
 	)
+
+	if m.RxBytes != nil {
+		c.client.EmitCounter("rx_bytes", loggregator.WithCounterSourceInfo(m.Tags["source_id"], m.Tags["instance_id"]), loggregator.WithTotal(*m.RxBytes))
+	}
+
+	if m.TxBytes != nil {
+		c.client.EmitCounter("tx_bytes", loggregator.WithCounterSourceInfo(m.Tags["source_id"], m.Tags["instance_id"]), loggregator.WithTotal(*m.TxBytes))
+	}
 
 	return nil
 }
