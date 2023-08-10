@@ -270,89 +270,145 @@ var _ = Describe("DiegoLoggingClient", func() {
 			Describe("SendAppMetrics", func() {
 				var batch *loggregator_v2.EnvelopeBatch
 
-				JustBeforeEach(func() {
-					metrics := client.ContainerMetric{
-						MemoryBytes:      50,
-						MemoryBytesQuota: 100,
+				Context("all container metrics are available", func() {
+					JustBeforeEach(func() {
+						rxBytes := uint64(42)
+						txBytes := uint64(43)
 
-						DiskBytes:      100,
-						DiskBytesQuota: 200,
+						metrics := client.ContainerMetric{
+							MemoryBytes:      50,
+							MemoryBytesQuota: 100,
 
-						CpuPercentage:          50.0,
-						AbsoluteCPUUsage:       1,
-						AbsoluteCPUEntitlement: 2,
-						ContainerAge:           3,
+							DiskBytes:      100,
+							DiskBytesQuota: 200,
 
-						RxBytes: 42,
-						TxBytes: 43,
+							CpuPercentage:          50.0,
+							AbsoluteCPUUsage:       1,
+							AbsoluteCPUEntitlement: 2,
+							ContainerAge:           3,
 
-						Tags: map[string]string{
+							RxBytes: &rxBytes,
+							TxBytes: &txBytes,
+
+							Tags: map[string]string{
+								"source_id":   "some-source-id",
+								"instance_id": "345",
+								"some-key":    "some-value",
+							},
+						}
+
+						Expect(c.SendAppMetrics(metrics)).To(Succeed())
+						batch = getEnvelopeBatch()
+					})
+
+					It("sets app info on all batches", func() {
+						expectedSourceID := "some-source-id"
+						expectedInstanceID := "345"
+
+						Expect(batch.Batch).To(HaveLen(1))
+						Expect(batch.Batch[0].GetSourceId()).To(Equal(expectedSourceID))
+						Expect(batch.Batch[0].GetInstanceId()).To(Equal(expectedInstanceID))
+
+						batch = getEnvelopeBatch()
+						Expect(batch.Batch).To(HaveLen(1))
+						Expect(batch.Batch[0].GetSourceId()).To(Equal(expectedSourceID))
+						Expect(batch.Batch[0].GetInstanceId()).To(Equal(expectedInstanceID))
+
+						batch = getEnvelopeBatch()
+						Expect(batch.Batch).To(HaveLen(1))
+						Expect(batch.Batch[0].GetSourceId()).To(Equal(expectedSourceID))
+						Expect(batch.Batch[0].GetInstanceId()).To(Equal(expectedInstanceID))
+
+						batch = getEnvelopeBatch()
+						Expect(batch.Batch).To(HaveLen(1))
+						Expect(batch.Batch[0].GetSourceId()).To(Equal(expectedSourceID))
+						Expect(batch.Batch[0].GetInstanceId()).To(Equal(expectedInstanceID))
+					})
+
+					It("sends memory usage and quota", func() {
+						metrics := batch.Batch[0].GetGauge().GetMetrics()
+						Expect(metrics["memory"].GetValue()).To(Equal(float64(50)))
+						Expect(metrics["memory"].GetUnit()).To(Equal("bytes"))
+
+						Expect(metrics["memory_quota"].GetValue()).To(Equal(float64(100)))
+						Expect(metrics["memory_quota"].GetUnit()).To(Equal("bytes"))
+					})
+
+					It("sends disk usage and quota", func() {
+						metrics := batch.Batch[0].GetGauge().GetMetrics()
+						Expect(metrics["disk"].GetValue()).To(Equal(float64(100)))
+						Expect(metrics["disk"].GetUnit()).To(Equal("bytes"))
+
+						Expect(metrics["disk_quota"].GetValue()).To(Equal(float64(200)))
+						Expect(metrics["disk_quota"].GetUnit()).To(Equal("bytes"))
+					})
+
+					It("sends cpu usage in a separate batch", func() {
+						batch = getEnvelopeBatch()
+
+						metrics := batch.Batch[0].GetGauge().GetMetrics()
+
+						Expect(metrics["absolute_usage"].GetValue()).To(Equal(float64(1)))
+						Expect(metrics["absolute_usage"].GetUnit()).To(Equal("nanoseconds"))
+
+						Expect(metrics["absolute_entitlement"].GetValue()).To(Equal(float64(2)))
+						Expect(metrics["absolute_entitlement"].GetUnit()).To(Equal("nanoseconds"))
+
+						Expect(metrics["container_age"].GetValue()).To(Equal(float64(3)))
+						Expect(metrics["container_age"].GetUnit()).To(Equal("nanoseconds"))
+					})
+
+					It("sends network traffic usage in a separate batches", func() {
+						batch = getEnvelopeBatch() // cpu usage batch
+
+						batch = getEnvelopeBatch() // network traffic usage batch received bytes
+						counter := batch.Batch[0].GetCounter()
+						Expect(counter.Name).To(Equal("rx_bytes"))
+						Expect(counter.Total).To(Equal(uint64(42)))
+
+						batch = getEnvelopeBatch() // network traffic usage batch transmitted bytes
+						counter = batch.Batch[0].GetCounter()
+						Expect(counter.Name).To(Equal("tx_bytes"))
+						Expect(counter.Total).To(Equal(uint64(43)))
+					})
+
+					It("sends tags", func() {
+						Expect(batch.Batch).To(HaveLen(1))
+						Expect(batch.Batch[0].GetTags()).To(Equal(map[string]string{
+							"origin":      "some-origin",
 							"source_id":   "some-source-id",
 							"instance_id": "345",
 							"some-key":    "some-value",
-						},
-					}
-
-					Expect(c.SendAppMetrics(metrics)).To(Succeed())
-					batch = getEnvelopeBatch()
+						}))
+					})
 				})
 
-				It("sets app info", func() {
-					Expect(batch.Batch).To(HaveLen(1))
-					Expect(batch.Batch[0].GetSourceId()).To(Equal("some-source-id"))
-					Expect(batch.Batch[0].GetInstanceId()).To(Equal("345"))
-				})
+				Context("network traffic usage is nil", func() {
+					JustBeforeEach(func() {
+						metrics := client.ContainerMetric{
+							RxBytes: nil,
+							TxBytes: nil,
+						}
 
-				It("sends memory usage and quota", func() {
-					metrics := batch.Batch[0].GetGauge().GetMetrics()
-					Expect(metrics["memory"].GetValue()).To(Equal(float64(50)))
-					Expect(metrics["memory"].GetUnit()).To(Equal("bytes"))
+						Expect(c.SendAppMetrics(metrics)).To(Succeed())
 
-					Expect(metrics["memory_quota"].GetValue()).To(Equal(float64(100)))
-					Expect(metrics["memory_quota"].GetUnit()).To(Equal("bytes"))
-				})
+						// receive all envelopes before the ones for network traffic usage
+						batch = getEnvelopeBatch()
+						batch = getEnvelopeBatch()
+					})
 
-				It("sends disk usage and quota", func() {
-					metrics := batch.Batch[0].GetGauge().GetMetrics()
-					Expect(metrics["disk"].GetValue()).To(Equal(float64(100)))
-					Expect(metrics["disk"].GetUnit()).To(Equal("bytes"))
+					It("does not send network traffic usage", func() {
+						// start waiting for a new envelope to be received
+						var firstEnvelopeOfNetworkTrafficUsage *loggregator_v2.EnvelopeBatch
+						go func() {
+							firstEnvelopeOfNetworkTrafficUsage, _ = sender.Recv()
+						}()
 
-					Expect(metrics["disk_quota"].GetValue()).To(Equal(float64(200)))
-					Expect(metrics["disk_quota"].GetUnit()).To(Equal("bytes"))
-				})
-
-				It("sends cpu usage in a separate batch", func() {
-					batch = getEnvelopeBatch()
-
-					metrics := batch.Batch[0].GetGauge().GetMetrics()
-
-					Expect(metrics["absolute_usage"].GetValue()).To(Equal(float64(1)))
-					Expect(metrics["absolute_usage"].GetUnit()).To(Equal("nanoseconds"))
-
-					Expect(metrics["absolute_entitlement"].GetValue()).To(Equal(float64(2)))
-					Expect(metrics["absolute_entitlement"].GetUnit()).To(Equal("nanoseconds"))
-
-					Expect(metrics["container_age"].GetValue()).To(Equal(float64(3)))
-					Expect(metrics["container_age"].GetUnit()).To(Equal("nanoseconds"))
-				})
-
-				It("sends network traffic usage", func() {
-					metrics := batch.Batch[0].GetGauge().GetMetrics()
-					Expect(metrics["rx_bytes"].GetValue()).To(Equal(float64(42)))
-					Expect(metrics["rx_bytes"].GetUnit()).To(Equal("bytes"))
-
-					Expect(metrics["tx_bytes"].GetValue()).To(Equal(float64(43)))
-					Expect(metrics["tx_bytes"].GetUnit()).To(Equal("bytes"))
-				})
-
-				It("sends tags", func() {
-					Expect(batch.Batch).To(HaveLen(1))
-					Expect(batch.Batch[0].GetTags()).To(Equal(map[string]string{
-						"origin":      "some-origin",
-						"source_id":   "some-source-id",
-						"instance_id": "345",
-						"some-key":    "some-value",
-					}))
+						// expect that there is no new envelope since there network traffic usage is nil
+						Eventually(func() *loggregator_v2.EnvelopeBatch {
+							return firstEnvelopeOfNetworkTrafficUsage
+						}).WithPolling(20 * time.Millisecond).MustPassRepeatedly(5).Should(BeNil())
+					})
 				})
 			})
 
