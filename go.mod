@@ -5,7 +5,7 @@ go 1.20
 require (
 	code.cloudfoundry.org/go-loggregator/v8 v8.0.5
 	github.com/onsi/ginkgo/v2 v2.13.0
-	github.com/onsi/gomega v1.28.1
+	github.com/onsi/gomega v1.29.0
 	golang.org/x/net v0.17.0
 	google.golang.org/grpc v1.59.0
 )
