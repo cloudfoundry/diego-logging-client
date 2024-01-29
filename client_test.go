@@ -86,12 +86,10 @@ var _ = Describe("DiegoLoggingClient", func() {
 
 		Context("and the loggregator agent is up", func() {
 			var sender loggregator_v2.Ingress_BatchSenderServer
+			var config client.Config
 
 			BeforeEach(func() {
-				sender = nil
-
-				var err error
-				c, err = client.NewIngressClient(client.Config{
+				config = client.Config{
 					SourceID:           "some-source-id",
 					InstanceID:         "some-instance-id",
 					BatchFlushInterval: 10 * time.Millisecond,
@@ -102,7 +100,14 @@ var _ = Describe("DiegoLoggingClient", func() {
 					KeyPath:            metronClientKeyFile,
 					CertPath:           metronClientCertFile,
 					JobOrigin:          "some-origin",
-				})
+				}
+			})
+
+			JustBeforeEach(func() {
+				sender = nil
+
+				var err error
+				c, err = client.NewIngressClient(config)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
@@ -282,10 +287,11 @@ var _ = Describe("DiegoLoggingClient", func() {
 							DiskBytes:      100,
 							DiskBytesQuota: 200,
 
-							CpuPercentage:          50.0,
-							AbsoluteCPUUsage:       1,
-							AbsoluteCPUEntitlement: 2,
-							ContainerAge:           3,
+							CpuPercentage:            50.0,
+							AbsoluteCPUUsage:         1,
+							AbsoluteCPUEntitlement:   2,
+							ContainerAge:             3,
+							CpuEntitlementPercentage: 4,
 
 							RxBytes: &rxBytes,
 							TxBytes: &txBytes,
@@ -356,6 +362,9 @@ var _ = Describe("DiegoLoggingClient", func() {
 
 						Expect(metrics["container_age"].GetValue()).To(Equal(float64(3)))
 						Expect(metrics["container_age"].GetUnit()).To(Equal("nanoseconds"))
+
+						Expect(metrics["cpu_entitlement"].GetValue()).To(Equal(float64(4)))
+						Expect(metrics["cpu_entitlement"].GetUnit()).To(Equal("percentage"))
 					})
 
 					It("sends network traffic usage in a separate batches", func() {
@@ -380,6 +389,33 @@ var _ = Describe("DiegoLoggingClient", func() {
 							"instance_id": "345",
 							"some-key":    "some-value",
 						}))
+					})
+
+					Context("when there is a metric filter", func() {
+
+						BeforeEach(func() {
+							config.AppMetricExclusionFilter = []string{"absolute_entitlement", "absolute_usage", "rx_bytes"}
+						})
+
+						It("does not send the filtered metrics", func() {
+							batch = getEnvelopeBatch()
+							metrics := batch.Batch[0].GetGauge().GetMetrics()
+
+							Expect(metrics).ShouldNot(HaveKey("absolute_entitlement"))
+							Expect(metrics).ShouldNot(HaveKey("absolute_usage"))
+
+							Expect(metrics["container_age"].GetValue()).To(Equal(float64(3)))
+							Expect(metrics["container_age"].GetUnit()).To(Equal("nanoseconds"))
+
+							Expect(metrics["cpu_entitlement"].GetValue()).To(Equal(float64(4)))
+							Expect(metrics["cpu_entitlement"].GetUnit()).To(Equal("percentage"))
+
+							batch = getEnvelopeBatch() // network traffic usage batch received bytes
+							txCounter := batch.Batch[0].GetCounter()
+
+							Expect(txCounter.Name).To(Equal("tx_bytes"))
+							Expect(txCounter.Total).To(Equal(uint64(43)))
+						})
 					})
 				})
 
