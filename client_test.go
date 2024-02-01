@@ -433,7 +433,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 						batch = getEnvelopeBatch()
 					})
 
-					It("does not send network traffic usage", func() {
+					It("does not send network traffic usage", Serial, func() {
 						// start waiting for a new envelope to be received
 						var firstEnvelopeOfNetworkTrafficUsage *loggregator_v2.EnvelopeBatch
 						go func() {
