@@ -13,8 +13,8 @@ require (
 )
 
 require (
-	code.cloudfoundry.org/go-diodes v0.0.0-20240220215648-1478b399ee36 // indirect
-	code.cloudfoundry.org/tlsconfig v0.0.0-20240301143844-95036809ae27 // indirect
+	code.cloudfoundry.org/go-diodes v0.0.0-20240311165541-d185017eb6db // indirect
+	code.cloudfoundry.org/tlsconfig v0.0.0-20240308143921-4b874b341ed6 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
@@ -24,7 +24,7 @@ require (
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.19.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240304212257-790db918fca8 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240314234333-6e1732d8331c // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
