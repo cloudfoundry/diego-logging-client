@@ -7,7 +7,7 @@ toolchain go1.21.7
 require (
 	code.cloudfoundry.org/go-loggregator/v8 v8.0.5
 	github.com/onsi/ginkgo/v2 v2.16.0
-	github.com/onsi/gomega v1.31.1
+	github.com/onsi/gomega v1.32.0
 	golang.org/x/net v0.22.0
 	google.golang.org/grpc v1.62.1
 )
