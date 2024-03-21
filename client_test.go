@@ -2,7 +2,6 @@ package diego_logging_client_test
 
 import (
 	"os"
-	"path"
 	"path/filepath"
 	"time"
 
@@ -11,15 +10,6 @@ import (
 	"code.cloudfoundry.org/go-loggregator/v8/rpc/loggregator_v2"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-)
-
-var (
-	fixturesPath         = path.Join(os.Getenv("DIEGO_RELEASE_DIR"), "src/code.cloudfoundry.org/diego-logging-client/fixtures")
-	metronCAFile         = path.Join(fixturesPath, "metron", "CA.crt")
-	metronServerCertFile = path.Join(fixturesPath, "metron", "metron.crt")
-	metronServerKeyFile  = path.Join(fixturesPath, "metron", "metron.key")
-	metronClientCertFile = path.Join(fixturesPath, "metron", "client.crt")
-	metronClientKeyFile  = path.Join(fixturesPath, "metron", "client.key")
 )
 
 var _ = Describe("DiegoLoggingClient", func() {
