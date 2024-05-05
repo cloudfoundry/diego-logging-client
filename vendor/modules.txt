@@ -6,7 +6,7 @@ code.cloudfoundry.org/go-diodes
 code.cloudfoundry.org/go-loggregator/v8
 code.cloudfoundry.org/go-loggregator/v8/rfc5424
 code.cloudfoundry.org/go-loggregator/v8/rpc/loggregator_v2
-# code.cloudfoundry.org/tlsconfig v0.0.0-20240427164042-d6180ef19863
+# code.cloudfoundry.org/tlsconfig v0.0.0-20240504164951-c74da1f146df
 ## explicit; go 1.19
 code.cloudfoundry.org/tlsconfig
 # github.com/go-logr/logr v1.4.1
