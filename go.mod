@@ -14,7 +14,7 @@ require (
 
 require (
 	code.cloudfoundry.org/go-diodes v0.0.0-20240515174142-71582f284718 // indirect
-	code.cloudfoundry.org/tlsconfig v0.0.0-20240522170710-79df114af82a // indirect
+	code.cloudfoundry.org/tlsconfig v0.0.0-20240530171334-2593348de0c6 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
