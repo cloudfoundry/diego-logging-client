@@ -8,21 +8,21 @@ require (
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1
 	github.com/onsi/ginkgo/v2 v2.19.0
 	github.com/onsi/gomega v1.33.1
-	golang.org/x/net v0.25.0
+	golang.org/x/net v0.26.0
 	google.golang.org/grpc v1.64.0
 )
 
 require (
-	code.cloudfoundry.org/go-diodes v0.0.0-20240515174142-71582f284718 // indirect
-	code.cloudfoundry.org/tlsconfig v0.0.0-20240530171334-2593348de0c6 // indirect
+	code.cloudfoundry.org/go-diodes v0.0.0-20240604201846-c756bfed2ed3 // indirect
+	code.cloudfoundry.org/tlsconfig v0.0.0-20240604172015-5be76e21ea65 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/pprof v0.0.0-20240528025155-186aa0362fba // indirect
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
-	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157 // indirect
+	golang.org/x/tools v0.22.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240604185151-ef581f913117 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
