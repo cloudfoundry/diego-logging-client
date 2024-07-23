@@ -1,5 +1,5 @@
-# code.cloudfoundry.org/go-diodes v0.0.0-20240604201846-c756bfed2ed3
-## explicit; go 1.21
+# code.cloudfoundry.org/go-diodes v0.0.0-20240723012033-bf559dd3d0b1
+## explicit; go 1.22
 code.cloudfoundry.org/go-diodes
 # code.cloudfoundry.org/go-loggregator/v9 v9.2.1
 ## explicit; go 1.21
@@ -101,7 +101,7 @@ golang.org/x/text/unicode/norm
 ## explicit; go 1.19
 golang.org/x/tools/cover
 golang.org/x/tools/go/ast/inspector
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20240722135656-d784300faade
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20240723171418-e6d459c13d2a
 ## explicit; go 1.20
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.65.0
