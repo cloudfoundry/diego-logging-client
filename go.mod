@@ -7,7 +7,7 @@ toolchain go1.22.3
 require (
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1
 	github.com/onsi/ginkgo/v2 v2.19.0
-	github.com/onsi/gomega v1.33.1
+	github.com/onsi/gomega v1.34.0
 	golang.org/x/net v0.27.0
 	google.golang.org/grpc v1.65.0
 )
