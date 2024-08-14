@@ -13,7 +13,7 @@ require (
 )
 
 require (
-	code.cloudfoundry.org/go-diodes v0.0.0-20240807231455-f9cf434a8c3e // indirect
+	code.cloudfoundry.org/go-diodes v0.0.0-20240813203737-5032edb05ceb // indirect
 	code.cloudfoundry.org/tlsconfig v0.1.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
