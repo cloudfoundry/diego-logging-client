@@ -105,7 +105,7 @@ golang.org/x/text/unicode/norm
 ## explicit; go 1.19
 golang.org/x/tools/cover
 golang.org/x/tools/go/ast/inspector
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20240822170219-fc7c04adadcd
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20240823204242-4ba0660f739c
 ## explicit; go 1.21
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.65.0
