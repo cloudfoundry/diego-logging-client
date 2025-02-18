@@ -1,11 +1,11 @@
-# code.cloudfoundry.org/go-diodes v0.0.0-20250120125122-6d632ec80998
+# code.cloudfoundry.org/go-diodes v0.0.0-20250217093403-cd1363c1f46a
 ## explicit; go 1.22.0
 code.cloudfoundry.org/go-diodes
 # code.cloudfoundry.org/go-loggregator/v9 v9.2.1
 ## explicit; go 1.21
 code.cloudfoundry.org/go-loggregator/v9
 code.cloudfoundry.org/go-loggregator/v9/rpc/loggregator_v2
-# code.cloudfoundry.org/tlsconfig v0.17.0
+# code.cloudfoundry.org/tlsconfig v0.18.0
 ## explicit; go 1.22
 code.cloudfoundry.org/tlsconfig
 # github.com/go-logr/logr v1.4.2
@@ -104,7 +104,7 @@ golang.org/x/text/unicode/norm
 golang.org/x/tools/cover
 golang.org/x/tools/go/ast/inspector
 golang.org/x/tools/internal/astutil/edge
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20250207221924-e9438ea467c6
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20250212204824-5a70512c5d8b
 ## explicit; go 1.22
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.70.0
