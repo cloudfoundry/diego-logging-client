@@ -14,11 +14,11 @@ require (
 
 require (
 	code.cloudfoundry.org/go-diodes v0.0.0-20250505082646-e4c2d772c2ec // indirect
-	code.cloudfoundry.org/tlsconfig v0.29.0 // indirect
+	code.cloudfoundry.org/tlsconfig v0.30.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20250607225305-033d6d78b36a // indirect
+	github.com/google/pprof v0.0.0-20250630185457-6e76a2b096b5 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.26.0 // indirect
