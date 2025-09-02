@@ -33,6 +33,22 @@ var _ = Describe("DiegoLoggingClient", func() {
 		metronClientKeyFile = filepath.Join(fixturesPath, "metron", "client.key")
 	})
 
+	Context("Config", func() {
+		It("returns the configured API address", func() {
+			config := client.Config{
+				APIHost: "api.example.com",
+				APIPort: 8080,
+			}
+			Expect(config.APIAddr()).To(Equal("api.example.com:8080"))
+		})
+		It("returns the default API address when no host is specified", func() {
+			config := client.Config{
+				APIPort: 8080,
+			}
+			Expect(config.APIAddr()).To(Equal("127.0.0.1:8080"))
+		})
+	})
+
 	Context("when the v2 api is used", func() {
 		var (
 			testIngressServer *testhelpers.TestIngressServer
