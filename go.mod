@@ -11,8 +11,8 @@ require (
 )
 
 require (
-	code.cloudfoundry.org/go-diodes v0.0.0-20251008062456-a5530d3e3f80 // indirect
-	code.cloudfoundry.org/tlsconfig v0.35.0 // indirect
+	code.cloudfoundry.org/go-diodes v0.0.0-20251020045843-c2c4393d1b2b // indirect
+	code.cloudfoundry.org/tlsconfig v0.36.0 // indirect
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
@@ -25,6 +25,6 @@ require (
 	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/text v0.30.0 // indirect
 	golang.org/x/tools v0.38.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251007200510-49b9836ed3ff // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251020155222-88f65dc88635 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 )
