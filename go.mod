@@ -1,6 +1,6 @@
 module code.cloudfoundry.org/diego-logging-client
 
-go 1.24.9
+go 1.25.0
 
 require (
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1
@@ -24,6 +24,6 @@ require (
 	golang.org/x/sys v0.41.0 // indirect
 	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/tools v0.42.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260209200024-4cfbd4190f57 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260223185530-2f722ef697dc // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
