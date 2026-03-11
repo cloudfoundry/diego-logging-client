@@ -385,14 +385,26 @@ var _ = Describe("DiegoLoggingClient", func() {
 						Expect(counter.Total).To(Equal(uint64(43)))
 					})
 
-					It("sends tags", func() {
-						Expect(batch.Batch).To(HaveLen(1))
-						Expect(batch.Batch[0].GetTags()).To(Equal(map[string]string{
+					It("sends tags on all envelopes including network traffic counters", func() {
+						expectedTags := map[string]string{
 							"origin":      "some-origin",
 							"source_id":   "some-source-id",
 							"instance_id": "345",
 							"some-key":    "some-value",
-						}))
+						}
+
+						Expect(batch.Batch[0].GetTags()).To(Equal(expectedTags))
+
+						batch = getEnvelopeBatch() // cpu usage batch
+						Expect(batch.Batch[0].GetTags()).To(Equal(expectedTags))
+
+						batch = getEnvelopeBatch() // rx_bytes
+						Expect(batch.Batch[0].GetCounter().Name).To(Equal("rx_bytes"))
+						Expect(batch.Batch[0].GetTags()).To(Equal(expectedTags))
+
+						batch = getEnvelopeBatch() // tx_bytes
+						Expect(batch.Batch[0].GetCounter().Name).To(Equal("tx_bytes"))
+						Expect(batch.Batch[0].GetTags()).To(Equal(expectedTags))
 					})
 
 					Context("when there is a metric filter", func() {
