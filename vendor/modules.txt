@@ -1,4 +1,4 @@
-# code.cloudfoundry.org/go-diodes v0.0.0-20260209061029-a81ffbc46978
+# code.cloudfoundry.org/go-diodes v0.0.0-20260427153419-57aa1b10ab4c
 ## explicit; go 1.24.0
 code.cloudfoundry.org/go-diodes
 # code.cloudfoundry.org/go-loggregator/v9 v9.2.1
@@ -28,7 +28,7 @@ github.com/google/go-cmp/cmp/internal/value
 # github.com/google/pprof v0.0.0-20260402051712-545e8a4df936
 ## explicit; go 1.24.0
 github.com/google/pprof/profile
-# github.com/onsi/ginkgo/v2 v2.28.1
+# github.com/onsi/ginkgo/v2 v2.28.2
 ## explicit; go 1.24.0
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
@@ -136,7 +136,7 @@ golang.org/x/tools/internal/stdlib
 golang.org/x/tools/internal/typeparams
 golang.org/x/tools/internal/typesinternal
 golang.org/x/tools/internal/versions
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20260420184626-e10c466a9529
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20260427160629-7cedc36a6bc4
 ## explicit; go 1.25.0
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.80.0
