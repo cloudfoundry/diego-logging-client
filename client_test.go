@@ -72,7 +72,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 				testIngressServer.Stop()
 			})
 
-			It("returns an error when constructing the loggregator client", func() {
+			It("does not return an error when constructing the loggregator client (non-blocking)", func() {
 				metricsPort := 8080
 
 				_, err := client.NewIngressClient(client.Config{
@@ -85,7 +85,7 @@ var _ = Describe("DiegoLoggingClient", func() {
 					KeyPath:            metronClientKeyFile,
 					CertPath:           metronClientCertFile,
 				})
-				Expect(err).To(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 
