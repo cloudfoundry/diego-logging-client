@@ -6,12 +6,12 @@ require (
 	code.cloudfoundry.org/go-loggregator/v9 v9.2.1
 	github.com/onsi/ginkgo/v2 v2.32.0
 	github.com/onsi/gomega v1.42.1
-	google.golang.org/grpc v1.81.1
+	google.golang.org/grpc v1.82.0
 )
 
 require (
-	code.cloudfoundry.org/go-diodes v0.0.0-20260629064500-85da08bf73ac // indirect
-	code.cloudfoundry.org/tlsconfig v0.60.0 // indirect
+	code.cloudfoundry.org/go-diodes v0.0.0-20260706112827-32a910f327a2 // indirect
+	code.cloudfoundry.org/tlsconfig v0.61.0 // indirect
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
@@ -22,8 +22,8 @@ require (
 	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
-	golang.org/x/text v0.38.0 // indirect
+	golang.org/x/text v0.39.0 // indirect
 	golang.org/x/tools v0.47.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260622175928-b703f567277d // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260706201446-f0a921348800 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
